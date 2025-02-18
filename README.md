@@ -10,7 +10,8 @@ pip install -r requirements.txt
 
 ## Instruction dataset generation
 
-### Dataset content 
+### Dataset content
+The instruction dataset comprises 1,022,742 image-instruction pairs spanning multiple vision-language tasks, including report generation, abnormality classification, anatomical and abnormality grounding, phrase grounding, and conversational interactions. Dataset sources and the corresponding number of image-instruction pairs are listed, with smaller datasets balanced by varying the frequency of instruction occurrences.
 
 | Task                    | Dataset source    | Image-instruction pairs (#) | Evaluation (#) | DUA                                                                                                                                          |
 |-------------------------|-------------------|-----------------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------|
@@ -26,4 +27,53 @@ pip install -r requirements.txt
 | Conversation            | MIMIC-CXR         | 80,312 × 1                  | 523            | [Yes](https://www.physionet.org/content/mimic-cxr-jpg/2.1.0/)                                                                                 |
 | Conversation (grounded) | MS-CXR            | 858 × 4                     | 157            | [Yes](https://physionet.org/content/ms-cxr/0.1/)                                                                                              |
 |                         | PadChest-GR       | 2,225 × 4                   | -              | [Yes](https://bimcv.cipf.es/bimcv-projects/padchest/padchest-dataset-research-use-agreement/)                                                  |
+
+### Datasets download 
+
+Each dataset can be downloaded following the data use and agreement (DUA column). Once the access is allowed, please organize the datasets as follows:
+
+datasets/
+├── MIMIC-CXR/
+│   ├── mimic-cxr-2.0.0-chexpert.csv
+│   ├── mimic-cxr-2.0.0-metadata.csv
+│   ├── mimic-cxr-2.0.0-split.csv
+│   ├── reports.csv
+│   ├── files/
+│   ├── filtered_reports/
+│   └── conversations/
+├── CheXpert/
+│   ├── train/
+│   ├── valid/
+│   ├── test/
+│   ├── train.csv
+│   ├── valid.csv
+│   └── test.csv
+├── CheXpertPlus/
+│   ├── PNG/
+│   │   ├── train/
+│   │   └── valid/
+│   ├── df_chexpert_plus_240401.csv
+│   └── filtered_reports/
+├── CHEST_IMA/
+│   └── silver_dataset/
+├── VinDr-CXR/
+│   ├── train_jpg/
+│   ├── test_jpg/
+│   ├── train/
+│   ├── test/
+│   ├── annotations_train.csv
+│   ├── annotations_test.csv
+│   ├── image_resolutions_train.json
+│   └── image_resolutions_test.json
+├── MS-CXR/
+│   ├── MS_CXR_Local_Alignment_v1.0.0.csv
+│   └── sentences_BBox_mscxr/ 
+└── PadChest/
+    ├── PADCHEST_chest_x_ray_images_labels_160K_01.02.19.csv
+    ├── master_table.csv
+    ├── grounded_reports_20240819.json
+    └── images_grounding/
+
+
+
 
