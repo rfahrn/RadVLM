@@ -31,7 +31,7 @@ The instruction dataset comprises 1,022,742 image-instruction pairs spanning mul
 ### Datasets download 
 
 Each dataset can be downloaded following the data use and agreement (DUA column). Once the access is allowed, please organize the datasets as follows:
-
+```
 datasets/
 ├── MIMIC-CXR/
 │   ├── mimic-cxr-2.0.0-chexpert.csv
@@ -73,6 +73,8 @@ datasets/
     ├── master_table.csv
     ├── grounded_reports_20240819.json
     └── images_grounding/
+```
+
 
 
 
