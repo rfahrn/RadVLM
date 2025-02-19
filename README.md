@@ -122,6 +122,31 @@ python data/llm_filter_reports.csv --api_key [azure_openAI_api_key] --padchest F
 This should be performed for both train and test splits, each containing standard and grounded conversations. 
 For PadChest-GR, just set the ` --padchest` argument to True, and only perform it for the train split and grounding argument. 
 
+### Create final llava dataset 
+Once the whole dataset architecture is built, in order to construct the instruction dataset as a unique json file in the llava format, execute the following command:
+```
+python create_llava_dataset.py
+```
+This file contains a list of dictionaries, each following this structure:
+```
+{
+    "image": "path/to/image.jpg",
+    "conversations": [
+        {
+            "from": "human",
+            "value": "<image>\n<question>"
+        },
+        {
+            "from": "gpt",
+            "value": "<answer>"
+        }
+    ],
+    "id": "<datapoint-id>"
+},
+```
+where `"image"` refers to the absolute path of the image, `"conversations"` contains the user-assistant instruction (single or multi-turn), and `"id"` is an arbitrary datapoint tag. This structure follows the LLaVA dataset format and can directly be used within their corresponding training script (https://github.com/LLaVA-VL/LLaVA-NeXT/tree/main/scripts/train).
+
+
 
 
 
