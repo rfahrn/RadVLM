@@ -74,15 +74,34 @@ datasets/
     ├── grounded_reports_20240819.json
     └── images_grounding/
 ```
-
+Make sure to set the environment variable `DATA_DIR` to the path of the main datasets directory. For example, if your datasets are located at `/home/username/datasets`, you can set the variable in your shell as follows:
+```
+export DATA_DIR=/home/username/datasets
+```
 In the above architecture, the files or folders marked with a `*` were not orginally part of the available datasets, and we describe below the procedure to generate each of them. The rest of the files are directly available in the official repositories. 
 
-## MIMIC-CXR
+## Filtering reports in MIMIC-CXR and CheXpert-Plus
 - The file `reports.csv` is obtained by following the findings/impression extraction procedure from the [official MIMIC-CXR github](https://github.com/MIT-LCP/mimic-cxr/tree/master/txt). 
-- The `filtered_reports` directory contains text reports filtered by GPT-4o, and organized by `study_id` (e.g., `53862424.txt`). In order to generate them, run the following command:
+- The `filtered_reports` directory contains text reports filtered by the Azure OpenAI API call of GPT-4o. The reports are stored as txt files, organized by `study_id` (e.g., `53862424.txt`). In order to generate them, run the following command:
 ```
-python llm_filter_reports.csv --api_key [azure_openAI_api_key] --chexpertplus False --num_chunks [number of parallel API calls]
+python llm_filter_reports.csv --api_key [azure_openAI_api_key] --chexpertplus False --split [train,test] --num_chunks [number of parallel API calls] 
 ```
+This command should be executed for both `train` and `test` split values, in order to construct both `train` and `test` sets. 
+Similarly, for CheXpertPlus, we can construct the `filtered_reports` folder, organized by studies, by executing the following command:
+```
+python llm_filter_reports.csv --api_key [azure_openAI_api_key] --chexpertplus True --split train --num_chunks [number of parallel API calls] 
+```
+
+## Converting dicom to jpg in VinDr-CXR
+The raw dataset of VinDr-CXR provides images in dicom format in folders `train` and `test`. We provide  
+
+
+
+
+
+
+
+
 
 
 
