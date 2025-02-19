@@ -15,32 +15,32 @@ The instruction dataset comprises 1,022,742 image-instruction pairs spanning mul
 
 | Task                    | Dataset source    | Image-instruction pairs (#) | Evaluation (#) | DUA                                                                                                                                          |
 |-------------------------|-------------------|-----------------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------|
-| Report Generation       | MIMIC-CXR         | 232,344 × 1                 | 3,282          | [Yes](https://www.physionet.org/content/mimic-cxr-jpg/2.1.0/)                                                                                 |
-|                         | CheXpert-Plus     | 178,368 × 1                 | -              | [Yes](https://stanfordaimi.azurewebsites.net/datasets/5158c524-d3ab-4e02-96e9-6ee9efc110a1)                                                   |
-| Abnormality classif.    | MIMIC-CXR         | 237,912 × 1                 | 518            | [Yes](https://www.physionet.org/content/mimic-cxr-jpg/2.1.0/)                                                                                 |
-|                         | CheXpert          | 191,027 × 1                 | -              | [Yes](https://stanfordaimi.azurewebsites.net/datasets/8cbd9ed4-2eb9-4565-affc-111cf4f7ebe2)                                                   |
-| Anatomical grounding    | Chest Imagenome   | 80,000 × 1                  | 2,000          | [Yes](https://physionet.org/content/chest-imagenome/1.0.0/)                                                                                    |
-| Abnormality grounding   | VinDr-CXR         | 16,089 × 3                  | 2,108          | [Yes](https://physionet.org/content/vindr-cxr/1.0.0/)                                                                                         |
-| Abnormality detection   | VinDr-CXR         | 15,000 × 2                  | -              | [Yes](https://physionet.org/content/vindr-cxr/1.0.0/)                                                                                         |
-| Phrase grounding        | MS-CXR            | 971 × 3                     | 189            | [Yes](https://physionet.org/content/ms-cxr/0.1/)                                                                                              |
-|                         | PadChest-GR       | 4,478 × 2                   | -              | [Yes](https://bimcv.cipf.es/bimcv-projects/padchest/padchest-dataset-research-use-agreement/)                                                  |
-| Conversation            | MIMIC-CXR         | 80,312 × 1                  | 523            | [Yes](https://www.physionet.org/content/mimic-cxr-jpg/2.1.0/)                                                                                 |
-| Conversation (grounded) | MS-CXR            | 858 × 4                     | 157            | [Yes](https://physionet.org/content/ms-cxr/0.1/)                                                                                              |
-|                         | PadChest-GR       | 2,225 × 4                   | -              | [Yes](https://bimcv.cipf.es/bimcv-projects/padchest/padchest-dataset-research-use-agreement/)                                                  |
+| Report Generation       | MIMIC-CXR         | 232,344 × 1                 | 3,282          | [physionet](https://www.physionet.org/content/mimic-cxr-jpg/2.1.0/)                                                                                 |
+|                         | CheXpert-Plus     | 178,368 × 1                 | -              | [stanfordaimi](https://stanfordaimi.azurewebsites.net/datasets/5158c524-d3ab-4e02-96e9-6ee9efc110a1)                                                   |
+| Abnormality classif.    | MIMIC-CXR         | 237,912 × 1                 | 518            | [physionet](https://www.physionet.org/content/mimic-cxr-jpg/2.1.0/)                                                                                 |
+|                         | CheXpert          | 191,027 × 1                 | -              | [stanfordaimi](https://stanfordaimi.azurewebsites.net/datasets/8cbd9ed4-2eb9-4565-affc-111cf4f7ebe2)                                                   |
+| Anatomical grounding    | Chest Imagenome   | 80,000 × 1                  | 2,000          | [physionet](https://physionet.org/content/chest-imagenome/1.0.0/)                                                                                    |
+| Abnormality grounding   | VinDr-CXR         | 16,089 × 3                  | 2,108          | [physionet](https://physionet.org/content/vindr-cxr/1.0.0/)                                                                                         |
+| Abnormality detection   | VinDr-CXR         | 15,000 × 2                  | -              | [physionet](https://physionet.org/content/vindr-cxr/1.0.0/)                                                                                         |
+| Phrase grounding        | MS-CXR            | 971 × 3                     | 189            | [physionet](https://physionet.org/content/ms-cxr/0.1/)                                                                                              |
+|                         | PadChest-GR       | 4,478 × 2                   | -              | [bimcv](https://bimcv.cipf.es/bimcv-projects/padchest-gr/)                                                  |
+| Conversation            | MIMIC-CXR         | 80,312 × 1                  | 523            | [physionet](https://www.physionet.org/content/mimic-cxr-jpg/2.1.0/)                                                                                 |
+| Conversation (grounded) | MS-CXR            | 858 × 4                     | 157            | [physionet](https://physionet.org/content/ms-cxr/0.1/)                                                                                              |
+|                         | PadChest-GR       | 2,225 × 4                   | -              | [bimcv](https://bimcv.cipf.es/bimcv-projects/padchest) / [bimcv](https://bimcv.cipf.es/bimcv-projects/padchest-gr/)                                                  |
 
 ### Datasets download 
 
-Each dataset can be downloaded following the data use and agreement (DUA column). Once the access is allowed, please organize the datasets as follows:
+Each dataset can be downloaded via the links provided in the right column. Once the access is allowed, the datasets should be organized as follows: 
 ```
 datasets/
 ├── MIMIC-CXR/
 │   ├── mimic-cxr-2.0.0-chexpert.csv
 │   ├── mimic-cxr-2.0.0-metadata.csv
 │   ├── mimic-cxr-2.0.0-split.csv
-│   ├── reports.csv
+│   ├── reports.csv * 
 │   ├── files/
-│   ├── filtered_reports/
-│   └── conversations/
+│   ├── filtered_reports/ *
+│   └── conversations/ *
 ├── CheXpert/
 │   ├── train/
 │   ├── valid/
@@ -53,27 +53,38 @@ datasets/
 │   │   ├── train/
 │   │   └── valid/
 │   ├── df_chexpert_plus_240401.csv
-│   └── filtered_reports/
+│   └── filtered_reports/ * 
 ├── CHEST_IMA/
 │   └── silver_dataset/
 ├── VinDr-CXR/
-│   ├── train_jpg/
-│   ├── test_jpg/
+│   ├── train_jpg/ * 
+│   ├── test_jpg/ * 
 │   ├── train/
 │   ├── test/
 │   ├── annotations_train.csv
 │   ├── annotations_test.csv
-│   ├── image_resolutions_train.json
-│   └── image_resolutions_test.json
+│   ├── image_resolutions_train.json * 
+│   └── image_resolutions_test.json * 
 ├── MS-CXR/
 │   ├── MS_CXR_Local_Alignment_v1.0.0.csv
-│   └── sentences_BBox_mscxr/ 
+│   └── sentences_BBox_mscxr/ * 
 └── PadChest/
     ├── PADCHEST_chest_x_ray_images_labels_160K_01.02.19.csv
     ├── master_table.csv
     ├── grounded_reports_20240819.json
     └── images_grounding/
 ```
+
+In the above architecture, the files or folders marked with a `*` were not orginally part of the available datasets, and we describe below the procedure to generate each of them. The rest of the files are directly available in the official repositories. 
+
+## MIMIC-CXR
+- The file `reports.csv` is obtained by following the findings/impression extraction procedure from the [official MIMIC-CXR github](https://github.com/MIT-LCP/mimic-cxr/tree/master/txt). 
+- The `filtered_reports` directory contains text reports filtered by GPT-4o, and organized by `study_id` (e.g., `53862424.txt`). In order to generate them, run the following command:
+```
+python llm_filter_reports.csv --api_key [azure_openAI_api_key] --chexpertplus False --num_chunks [number of parallel API calls]
+```
+
+
 
 
 
