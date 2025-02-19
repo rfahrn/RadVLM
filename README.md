@@ -82,21 +82,31 @@ In the above architecture, the files or folders marked with a `*` were not orgin
 
 ## Filtering reports in MIMIC-CXR and CheXpert-Plus
 - The file `reports.csv` is obtained by following the findings/impression extraction procedure from the [official MIMIC-CXR github](https://github.com/MIT-LCP/mimic-cxr/tree/master/txt). 
-- The `filtered_reports` directory contains text reports filtered by the Azure OpenAI API call of GPT-4o. The reports are stored as txt files, organized by `study_id` (e.g., `53862424.txt`). In order to generate them, run the following command:
+- The `filtered_reports` directory contains text reports filtered by the Azure OpenAI API call of GPT-4o. The reports are stored as txt files, organized by `study_id` (e.g., `53862424.txt`). In order to generate this directory, run the following command:
 ```
 python data/llm_filter_reports.csv --api_key [azure_openAI_api_key] --chexpertplus False --split [train,test] --num_chunks [number of parallel API calls] 
 ```
-This command should be executed for both `train` and `test` split values, in order to construct both `train` and `test` sets. 
-Similarly, for CheXpertPlus, we can construct the `filtered_reports` folder, organized by studies, by executing the following command:
+This command will leverage the GPT-4o prompt stored in `data/prefixes_prompts/prefix_filter_reports.txt` to remove statements referring to previous studies. It should be executed for both `train` and `test` split values, in order to construct both `train` and `test` sets. 
+Similarly, for CheXpertPlus, we can construct the `filtered_reports` folder, organized by studies, by executing the following command (only for train split):
 ```
 python data/llm_filter_reports.csv --api_key [azure_openAI_api_key] --chexpertplus True --split train --num_chunks [number of parallel API calls] 
 ```
 
 ## Converting dicom to jpg in VinDr-CXR
-The raw dataset of VinDr-CXR provides images in dicom format in folders `train` and `test`. To obtain the jpg images in directories `train_jpg` and `test_jpg`, as well as the files containing the image dimensions `image_resolutions_train.json` and `image_resolutions_test.json`, execude the following command:
+The raw dataset of VinDr-CXR provides images in dicom format in folders `train` and `test`. To obtain the jpg images in directories `train_jpg` and `test_jpg`, as well as the files containing the image dimensions `image_resolutions_train.json` and `image_resolutions_test.json`, execute the following command:
 ```
 python data/preprocess_scripts/dicom2jpg_vindrcxr.py
 ```
+
+## Preprocess grounded phrases in MS-CXR
+We re-organize the MS-CXR dataset by creating one json file per image (following MIMIC-CXR `image_id`), with bounding boxes normalized from 0 to 1. These are contained in the directory `sentences_BBox_mscxr/` that can be obtained by executing:
+```
+python data/preprocess_scripts/normalize_mscxr.py.py
+```
+
+
+
+
 
 
 
