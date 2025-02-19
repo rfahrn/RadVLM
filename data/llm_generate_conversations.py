@@ -102,34 +102,44 @@ def main():
     if DATA_DIR is None:
         raise EnvironmentError("The environment variable 'DATA_DIR' is not set.")
 
-    datasetpath = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG')
-    filtered_reports_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG/filtered_reports')
-    datasetpath_mscxr = os.path.join(DATA_DIR, 'MS-CXR')
 
-    if args.grounding:
-        sentencesBBoxpath = os.path.join(datasetpath_mscxr, 'sentences_and_BBox_mscxr')
-        prefix_file_path = os.path.join(script_dir, 'prefixes_prompts/prefix_conv_grounding.txt')
-        folder_name = 'grounding'
+    if not args.padchest:
+        datasetpath = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG')
+        filtered_reports_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG/filtered_reports')
+        datasetpath_mscxr = os.path.join(DATA_DIR, 'MS-CXR')
+        if args.grounding:
+            sentencesBBoxpath = os.path.join(datasetpath_mscxr, 'sentences_and_BBox_mscxr')
+            prefix_file_path = os.path.join(script_dir, 'prefixes_prompts/prefix_conv_grounding.txt')
+            folder_name = 'grounding'
+        else:
+            sentencesBBoxpath = None # full MIMIC-CXR dataset
+            prefix_file_path = os.path.join(script_dir, 'prefixes_prompts/prefix_conv.txt')
+            folder_name = 'standard'
+
+        split = args.split
+        dataset = MIMIC_Dataset_MM(
+            datasetpath=datasetpath,
+            split=split,
+            flag_img=False,
+            flag_lab=True,
+            only_frontal=True,
+            flag_instr=False,
+            filtered_reports_dir=filtered_reports_dir,
+            sentencesBBoxpath=sentencesBBoxpath,
+            classif=False,
+            seed=0
+        )
+        print(f"Total dataset size: {len(dataset)}")
     else:
-        sentencesBBoxpath = None # full MIMIC-CXR dataset
-        prefix_file_path = os.path.join(script_dir, 'prefixes_prompts/prefix_conv.txt')
-        folder_name = 'standard'
+        datasetpath = os.path.join(DATA_DIR, 'PadChest')
+        split = 'valid' 
+        dataset = PadChest_grounding_per_image(
+            datasetpath=datasetpath,
+            split=split, 
+            flag_instr=False
+        )
 
-    split = args.split
 
-    dataset = MIMIC_Dataset_MM(
-        datasetpath=datasetpath,
-        split=split,
-        flag_img=False,
-        flag_lab=True,
-        only_frontal=True,
-        flag_instr=True,
-        filtered_reports_dir=filtered_reports_dir,
-        sentencesBBoxpath=sentencesBBoxpath,
-        classif=False,
-        seed=0
-    )
-    print(f"Total dataset size: {len(dataset)}")
 
     output_dir = os.path.join(datasetpath, 'conversations', split, folder_name)
     
