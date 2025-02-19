@@ -106,7 +106,8 @@ def main():
 
     # Adjust these paths as needed:
     # DATA_DIR = "/capstor/store/cscs/swissai/a02/health_mm_llm_shared/data"
-    prefix_file_path = 'prefixes_prompts/prefix_filter_reports.txt'
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    prefix_file_path = os.path.join(script_dir, 'prefixes_prompts/prefix_filter_reports.txt')
 
     # Example for MIMIC-CXR:
     split = "train"

@@ -92,8 +92,13 @@ def main():
     print("Using OpenAI API key from argument.")
 
     # File paths and dataset configuration (adjust as needed)
-    prefix_file_path = 'prefixes_prompts/prefix_conv.txt'
-    # DATA_DIR = "/capstor/store/cscs/swissai/a02/health_mm_llm_shared/data"
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+
+    DATA_DIR = os.environ.get('DATA_DIR')
+    if DATA_DIR is None:
+        raise EnvironmentError("The environment variable 'DATA_DIR' is not set.")
+
+    prefix_file_path = os.path.join(script_dir, 'prefixes_prompts/prefix_conv.txt')
     datasetpath = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG')
     filtered_reports_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG/filtered_reports')
     sentencesBBoxpath = os.path.join(datasetpath, 'sentences_and_BBox_mscxr')
