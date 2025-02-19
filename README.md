@@ -93,7 +93,12 @@ python llm_filter_reports.csv --api_key [azure_openAI_api_key] --chexpertplus Tr
 ```
 
 ## Converting dicom to jpg in VinDr-CXR
-The raw dataset of VinDr-CXR provides images in dicom format in folders `train` and `test`. We provide  
+The raw dataset of VinDr-CXR provides images in dicom format in folders `train` and `test`. To obtain the jpg images in directories `train_jpg` and `test_jpg`, as well as the files containing the image dimensions `image_resolutions_train.json` and `image_resolutions_test.json`, execude the following command:
+```
+python data/preprocess_scripts/dicom2jpg_vindrcxr.py
+```
+
+
 
 
 
