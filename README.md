@@ -84,12 +84,12 @@ In the above architecture, the files or folders marked with a `*` were not orgin
 - The file `reports.csv` is obtained by following the findings/impression extraction procedure from the [official MIMIC-CXR github](https://github.com/MIT-LCP/mimic-cxr/tree/master/txt). 
 - The `filtered_reports` directory contains text reports filtered by the Azure OpenAI API call of GPT-4o. The reports are stored as txt files, organized by `study_id` (e.g., `53862424.txt`). In order to generate them, run the following command:
 ```
-python llm_filter_reports.csv --api_key [azure_openAI_api_key] --chexpertplus False --split [train,test] --num_chunks [number of parallel API calls] 
+python data/llm_filter_reports.csv --api_key [azure_openAI_api_key] --chexpertplus False --split [train,test] --num_chunks [number of parallel API calls] 
 ```
 This command should be executed for both `train` and `test` split values, in order to construct both `train` and `test` sets. 
 Similarly, for CheXpertPlus, we can construct the `filtered_reports` folder, organized by studies, by executing the following command:
 ```
-python llm_filter_reports.csv --api_key [azure_openAI_api_key] --chexpertplus True --split train --num_chunks [number of parallel API calls] 
+python data/llm_filter_reports.csv --api_key [azure_openAI_api_key] --chexpertplus True --split train --num_chunks [number of parallel API calls] 
 ```
 
 ## Converting dicom to jpg in VinDr-CXR
