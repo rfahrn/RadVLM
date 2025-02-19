@@ -4,7 +4,7 @@ import os
 import re
 import sys
 from datasets import *
-from utils import *
+from utils import process_sbb, inference_gpt4o_with_retry
 from torch.utils.data import random_split
 import random
 import requests
@@ -21,7 +21,7 @@ def create_conversation_dataset(input_dataset, prefix_file_path, output_dir):
     
     for i in range(len(input_dataset)):
         # Stop if output directory already has 150,000 files
-        if len(os.listdir(output_dir)) >= 150000:
+        if len(os.listdir(output_dir)) >= 100000:
             print("Reached 150,000 files. Interrupting the loop.")
             break
 
@@ -70,11 +70,11 @@ def create_conversation_dataset(input_dataset, prefix_file_path, output_dir):
             print("Could not extract a list")
 
 
+
 def process_chunk(chunk_index, chunk, prefix_file_path, output_dir, api_key):
-    # Set the API key from the command-line argument in each process
-    os.environ['OPENAI_API_KEY'] = api_key
     print(f"Processing chunk {chunk_index} on process {os.getpid()}")
     create_conversation_dataset(chunk, prefix_file_path, output_dir)
+
 
 
 def main():
@@ -85,6 +85,10 @@ def main():
                         help="Your OpenAI API key.")
     parser.add_argument("--num_chunks", type=int, default=1,
                         help="Number of chunks to split the dataset into (and number of parallel processes).")
+    parser.add_argument("--split", choices=['train', 'test'], type=str, required=True,
+                        help="The dataset split")
+    parser.add_argument("--grounding", action="store_true",
+                        help="If set, will generate conversation including grounding questions")
     args = parser.parse_args()
 
     # Optionally, set the API key in the main process as well.
@@ -98,15 +102,25 @@ def main():
     if DATA_DIR is None:
         raise EnvironmentError("The environment variable 'DATA_DIR' is not set.")
 
-    prefix_file_path = os.path.join(script_dir, 'prefixes_prompts/prefix_conv.txt')
     datasetpath = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG')
     filtered_reports_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG/filtered_reports')
-    sentencesBBoxpath = os.path.join(datasetpath, 'sentences_and_BBox_mscxr')
+    datasetpath_mscxr = os.path.join(DATA_DIR, 'MS-CXR')
+
+    if args.grounding:
+        sentencesBBoxpath = os.path.join(datasetpath_mscxr, 'sentences_and_BBox_mscxr')
+        prefix_file_path = os.path.join(script_dir, 'prefixes_prompts/prefix_conv_grounding.txt')
+        folder_name = 'grounding'
+    else:
+        sentencesBBoxpath = None # full MIMIC-CXR dataset
+        prefix_file_path = os.path.join(script_dir, 'prefixes_prompts/prefix_conv.txt')
+        folder_name = 'standard'
+
+    split = args.split
 
     dataset = MIMIC_Dataset_MM(
         datasetpath=datasetpath,
-        split="test",
-        flag_img=True,
+        split=split,
+        flag_img=False,
         flag_lab=True,
         only_frontal=True,
         flag_instr=True,
@@ -117,7 +131,7 @@ def main():
     )
     print(f"Total dataset size: {len(dataset)}")
 
-    output_dir = os.path.join(datasetpath, 'conversations_test_grounding')
+    output_dir = os.path.join(datasetpath, 'conversations', split, folder_name)
     
     # Ensure reproducibility
     import torch

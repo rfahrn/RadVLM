@@ -92,6 +92,8 @@ def main():
                         help="Your OpenAI API key.")
     parser.add_argument("--chexpertplus", action="store_true",
                         help="If set, will process CheXpertPlus dataset logic (naming by image_id).")
+    parser.add_argument("--split", choices=['train', 'test'], type=str, required=True,
+                        help="The dataset split")
     parser.add_argument("--num_chunks", type=int, default=1,
                         help="How many total chunks to split the dataset into (number of parallel processes).")
     args = parser.parse_args()
@@ -110,7 +112,7 @@ def main():
     prefix_file_path = os.path.join(script_dir, 'prefixes_prompts/prefix_filter_reports.txt')
 
     # Example for MIMIC-CXR:
-    split = "train"
+    split = args.split
     if args.chexpertplus:
         # Use CheXpertPlus dataset logic
         datasetpath = os.path.join(DATA_DIR, 'CheXpertPlus')
