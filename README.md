@@ -111,7 +111,7 @@ python data/preprocess_scripts/dicom2jpg_vindrcxr.py
 ### Preprocess grounded phrases in MS-CXR
 We re-organize the MS-CXR dataset by creating one json file per image (following MIMIC-CXR `image_id`), with bounding boxes normalized from 0 to 1. These are contained in the directory `sentences_BBox_mscxr/` that can be obtained by executing:
 ```
-python data/preprocess_scripts/normalize_mscxr.py.py
+python data/preprocess_scripts/normalize_mscxr.py
 ```
 
 ### Generate conversations 
