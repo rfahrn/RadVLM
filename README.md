@@ -32,7 +32,6 @@ The instruction dataset comprises 1,022,742 image-instruction pairs spanning mul
 
 Each dataset can be downloaded via the links provided in the right column. Once the access is allowed, the datasets should be organized as follows: 
 ```
-```
 datasets/
 ├── MIMIC-CXR/
 │   ├── mimic-cxr-2.0.0-chexpert.csv
@@ -84,6 +83,7 @@ datasets/
 │   │   └── train/
 │   │   │   └── grounding/
 ```
+
 Make sure to set the environment variable `DATA_DIR` to the path of the main datasets directory. For example, if your datasets are located at `/home/username/datasets`, you can set the variable in your shell as follows:
 ```
 export DATA_DIR=/home/username/datasets
