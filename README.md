@@ -32,6 +32,7 @@ The instruction dataset comprises 1,022,742 image-instruction pairs spanning mul
 
 Each dataset can be downloaded via the links provided in the right column. Once the access is allowed, the datasets should be organized as follows: 
 ```
+```
 datasets/
 ├── MIMIC-CXR/
 │   ├── mimic-cxr-2.0.0-chexpert.csv
@@ -41,6 +42,12 @@ datasets/
 │   ├── files/
 │   ├── filtered_reports/ *
 │   └── conversations/ *
+│   │   ├── train/
+│   │   │   ├── standard/
+│   │   │   └── grounding/
+│   │   └── test/
+│   │   │   ├── standard/
+│   │   │   └── grounding/
 ├── CheXpert/
 │   ├── train/
 │   ├── valid/
@@ -69,10 +76,13 @@ datasets/
 │   ├── MS_CXR_Local_Alignment_v1.0.0.csv
 │   └── sentences_BBox_mscxr/ * 
 └── PadChest/
-    ├── PADCHEST_chest_x_ray_images_labels_160K_01.02.19.csv
-    ├── master_table.csv
-    ├── grounded_reports_20240819.json
-    └── images_grounding/
+│   ├── PADCHEST_chest_x_ray_images_labels_160K_01.02.19.csv
+│   ├── master_table.csv
+│   ├── grounded_reports_20240819.json
+│   ├── images_grounding/
+│   └── conversations/ *
+│   │   └── train/
+│   │   │   └── grounding/
 ```
 Make sure to set the environment variable `DATA_DIR` to the path of the main datasets directory. For example, if your datasets are located at `/home/username/datasets`, you can set the variable in your shell as follows:
 ```
