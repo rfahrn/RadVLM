@@ -6,7 +6,9 @@ import json
 import os
 
 
-DATA_DIR = "/capstor/store/cscs/swissai/a02/health_mm_llm_shared/data"
+DATA_DIR = os.environ.get('DATA_DIR')
+if DATA_DIR is None:
+    raise EnvironmentError("The environment variable 'DATA_DIR' is not set.")
 
 from torch.utils.data import ConcatDataset
 # MIMIC-CXR 

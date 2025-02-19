@@ -76,6 +76,12 @@ def dcm2jpg_resolutions_vindrcxr(data_dir, split, image_size=512):
 
     print("Conversion and resolution extraction complete.")
 
+
+
+DATA_DIR = os.environ.get('DATA_DIR')
+if DATA_DIR is None:
+    raise EnvironmentError("The environment variable 'DATA_DIR' is not set.")
+
 vindr_cxr_data_dir = os.path.join(DATA_DIR, 'VinDr-CXR')
 
 dcm2jpg_resolutions_vindrcxr(vindr_cxr_data_dir, 'train', image_size=512)

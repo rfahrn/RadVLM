@@ -100,6 +100,10 @@ def main():
     os.environ['OPENAI_API_KEY'] = args.api_key
     print("Using OpenAI API key from argument.")
 
+    DATA_DIR = os.environ.get('DATA_DIR')
+    if DATA_DIR is None:
+        raise EnvironmentError("The environment variable 'DATA_DIR' is not set.")
+
     # Adjust these paths as needed:
     # DATA_DIR = "/capstor/store/cscs/swissai/a02/health_mm_llm_shared/data"
     prefix_file_path = 'prefixes_prompts/prefix_filter_reports.txt'
