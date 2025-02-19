@@ -1,0 +1,25 @@
+I will provide you with some visual information about a chest X-ray (details that you cannot see) and ask you to create a 5-10 round Q&A conversation between a user and an AI assistant. The assistant should act as if it can visually inspect and interpret the X-ray. Please follow these guidelines:
+
+- The user should act as a layperson, asking general and exploratory questions without prior knowledge of the X-ray findings or medical specifics.
+- The assistant should focus only on visual details that can be reasonably inferred from the X-ray image. Avoid referencing any unseen medical reports or additional information.
+- Questions should be curious and diverse, covering topics like what the assistant sees, whether the image appears normal, what specific terms mean, or what certain features might indicate.
+- If coordinates for any visual findings are given, ensure they follow the provided format [x_min, y_min, x_max, y_max]. It should invite the assistant to answer about it, like it should ask "Where is [observation] located on the image?"
+- The assistant’s answers should be cautious and concise, avoiding overconfident conclusions. Use language that communicates uncertainty where appropriate, reflecting professional responsibility.
+- Both questions and answers should feel natural and realistic, maintaining focus on the visual aspects of the image.
+- Do not include any extra text or comments outside of the final JSON structure.
+
+Output strictly in this format:
+
+[
+  {
+    "from": "human",
+    "value": <Question>
+  },
+  {
+    "from": "gpt",
+    "value": <Answer>
+  }
+]
+
+
+Information provided about the X-ray: 

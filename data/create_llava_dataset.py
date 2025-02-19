@@ -4,6 +4,7 @@ from datasets import *
 from utils import *
 import json
 import os
+from create_instructions import generate_llava_dataset_from_instruction_dataset
 
 
 DATA_DIR = os.environ.get('DATA_DIR')
@@ -43,7 +44,7 @@ print("")
 # CheXpert 
 print("CheXpert classif")
 dataset_path = os.path.join(DATA_DIR, "CheXpert")   
-chexpert_dataset = CheX_Dataset_MM(datasetpath=dataset_path,split="train", flag_img=False)
+chexpert_dataset = CheXpert_Dataset_MM(datasetpath=dataset_path,split="train", flag_img=False)
 print("Num samples = " + str(len(chexpert_dataset)))
 print("")
 
@@ -91,7 +92,7 @@ print("")
 # Phrase grounding 
 print("Phrase grounding MS-CXR")
 
-sentencesBBoxpath = os.path.join(datasetpath_mimic, 'sentences_and_BBox_mscxr')
+sentencesBBoxpath = os.path.join(DATA_DIR, 'MS-CXR','sentences_and_BBox_mscxr')
 
 
 dataset_train = MS_CXR(
@@ -147,11 +148,11 @@ print("")
 
 
 # CONVERSATIONS
-print("Conversations")
+print("Conversations standard")
 
-conversation_dir= os.path.join(datasetpath_chestima, 'conversations_train')
+conversation_dir= os.path.join(datasetpath_chestima, 'conversations/train/standard')
 
-conv_dataset_nogrounded = Chest_ImaGenome_Dataset(
+conv_dataset_standard = Chest_ImaGenome_Dataset(
     datasetpath=datasetpath_mimic,
     datasetpath_chestima=datasetpath_chestima,
     split="train", 
@@ -162,13 +163,13 @@ conv_dataset_nogrounded = Chest_ImaGenome_Dataset(
     pick_one_region=True,
     conversation_dir=conversation_dir
     )
-print("Num samples = " + str(len(conv_dataset_nogrounded)))
+print("Num samples = " + str(len(conv_dataset_standard)))
 print("")
 
 
 print("Conversations grounded")
 
-conversation_dir =  os.path.join(datasetpath_mimic, 'conversations_train_grounding') # if present 
+conversation_dir =  os.path.join(datasetpath_mimic, 'conversations/train/grounding') # if present 
 filtered_reports_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG/filtered_reports_new')
 conv_dataset_grounded = MIMIC_Dataset_MM(
     datasetpath = datasetpath_mimic,
@@ -185,9 +186,9 @@ print("Num samples = " + str(len(conv_dataset_grounded)))
 print("")
 
 print("Conversations grounded padchest")
-
+datasetpath = os.path.join(DATA_DIR, 'PadChest')
 split_train = 'train'
-conversation_dir = os.path.join(datasetpath, 'conversations_train_grounding_padchest')
+conversation_dir = os.path.join(datasetpath, 'conversations/train/padchest')
 dataset_train = PadChest_grounding_per_image(
     datasetpath=datasetpath,
     split=split_train,
@@ -197,6 +198,7 @@ dataset_train = PadChest_grounding_per_image(
 )
 # Create the validation dataset.
 split_valid = 'valid'
+conversation_dir = os.path.join(datasetpath, 'conversations/valid/padchest')
 # If your valid conversation files are in a different folder, set it accordingly.
 dataset_valid = PadChest_grounding_per_image(
     datasetpath=datasetpath,
@@ -279,7 +281,7 @@ dataset_info = [
     }, 
     
     {
-        "dataset":conv_dataset_nogrounded,
+        "dataset":conv_dataset_standard,
         "id_prefix":"conv-train",
     }, 
     
