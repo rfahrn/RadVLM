@@ -96,11 +96,6 @@ def main():
     # File paths and dataset configuration (adjust as needed)
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
-    DATA_DIR = os.environ.get('DATA_DIR')
-    if DATA_DIR is None:
-        raise EnvironmentError("The environment variable 'DATA_DIR' is not set.")
-
-
     if not args.padchest:
         datasetpath = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG')
         filtered_reports_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG/filtered_reports')
