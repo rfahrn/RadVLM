@@ -165,6 +165,11 @@ The training script accesses this dataset via the argument `data_path`, hyperpar
 
 ## Evaluation 
 
+For the evaluation, activate the `radvlm` environment previously created:
+```
+conda activate radvlm
+```
+
 ### Conversion of llava-ov checkpoint to huggingface format 
 A first step consists of converting the RadVLM checkpoint obtained after finetuning llava-onevision on the radiology instruction dataset, following the finetuning section. In the case of a 7B checkpoint, this can be performed by executing the following command: 
 ```
