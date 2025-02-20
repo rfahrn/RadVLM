@@ -39,9 +39,11 @@ from compute_metrics_tasks import evaluate_results
 
 
 # Constants for directories (consider making these command-line arguments or config)
-DATA_DIR = "/store/swissai/a02/health_mm_llm_shared/data"
-DATA_DIR =  "/capstor/store/cscs/swissai/a02/health_mm_llm_shared/data"
-RESULTS_DIR = "results"
+DATA_DIR = os.environ.get('DATA_DIR')
+if DATA_DIR is None:
+    raise EnvironmentError("The environment variable 'DATA_DIR' is not set.")
+script_dir = os.path.dirname(os.path.abspath(__file__))
+RESULTS_DIR = os.path.join(script_dir, "results")
 
 
 def parse_arguments():
@@ -80,7 +82,7 @@ def load_dataset(task, data_dir):
     elif task == "abnormality_grounding":
         dataset_path = os.path.join(data_dir, "VinDr-CXR")
         dataset = VinDr_CXR_Single_Label_Dataset(
-            datasetpath=dataset_path, split="test", flag_img=False, seed=0
+            datasetpath=dataset_path, split="test", flag_img=False
         )
     elif task == "abnormality_detection":
         dataset_path = os.path.join(data_dir, "VinDr-CXR") 
@@ -103,42 +105,30 @@ def load_dataset(task, data_dir):
         datasetpath_chestima = os.path.join(data_dir, 'CHEST_IMA')
         split = "test"
         if task == "region_grounding":
-            sentencesBBoxpath = None
             dataset = Chest_ImaGenome_Dataset(
             datasetpath=datasetpath,
             datasetpath_chestima=datasetpath_chestima, 
             split=split, 
             flag_img=False, 
             flag_lab=False,
-            sentencesBBoxpath=sentencesBBoxpath,
             flag_instr=True, 
             flag_txt=False, 
             seed=4
             )
         else:
-            datasetpath = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG')
-            datasetpath_chestima = os.path.join(DATA_DIR, 'CHEST_IMA')
+            datasetpath_mimic = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG')
+            datasetpath_mscxr = os.path.join(DATA_DIR, 'CHEST_IMA')
 
             split = "test"
-            sentencesBBoxpath = os.path.join(datasetpath_chestima, 'sentences_and_BBox_mscxr')
+            sentencesBBoxpath = os.path.join(datasetpath_mscxr, 'sentences_and_BBox_mscxr')
             dataset = MS_CXR(
-                datasetpath = datasetpath,
+                datasetpath = datasetpath_mimic,
                 split=split, flag_img=True, 
                 flag_lab=True, only_frontal=True, 
                 flag_instr=True, 
                 sentencesBBoxpath=sentencesBBoxpath,
                 seed=0)
 
-                    
-
-    elif task == "object_grounding":
-        dataset_path = os.path.join(data_dir, "Object-CXR")
-        dataset = Object_CXR_Dataset(
-            datasetpath=dataset_path,
-            split='valid',
-            flag_img=False,
-            seed=500
-        )
     else:
         raise ValueError(f"Unsupported task: {task}")
     
@@ -197,10 +187,7 @@ def process_inference_for_single_instruction(tokenizer, model, processor, data_l
                 generated_text = inference_chexagent(model, tokenizer, image_path, prompt, grounding=True)
 
         elif model_name == 'llavamed':
-            generated_text, chat_history = inference_llavamed(model, processor, image_path, prompt)
-
-        elif model_name == 'qwen2vl':
-            generated_text, chat_history = inference_qwen2vl(model, processor, image_path, prompt)
+            generated_text, _ = inference_llavamed(model, processor, image_path, prompt)
 
         elif model_name == 'maira2':
             if task == 'report_generation':
@@ -209,7 +196,7 @@ def process_inference_for_single_instruction(tokenizer, model, processor, data_l
                 generated_text = inference_maira2_grounding(model, processor, image_path, datapoint['label'])
         else:
             # for llava-ov checkpoint
-            generated_text, chat_history = inference_llavaov(model, processor, image_path, prompt)
+            generated_text, _ = inference_llavaov(model, processor, image_path, prompt)
 
         # Store results in dictionary 
         optional_keys = ["id", "idx", "img_path", "img", "labels", "label", "txt", "boxes"]

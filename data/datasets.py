@@ -296,7 +296,7 @@ class PadChest_grounding_per_image(Dataset):
 
         if self.flag_img:
             img = imread(sample_info["img_path"])
-            sample["img"] = safe_normalize(img, maxval=255, reshape=True)
+            sample["img"] = normalize(img, maxval=255, reshape=True)
         
         if self.flag_instr:
             # Insert your instruction generation logic if desired.
