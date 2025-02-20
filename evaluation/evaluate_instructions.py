@@ -1,47 +1,27 @@
 import os
-import sys
 import json
 import argparse
 import random
-import logging
-from numpy import asarray
-from PIL import Image
-
-import torch
 from torch.utils.data import DataLoader, DistributedSampler
-
-import matplotlib.pyplot as plt
-
-
 from accelerate import PartialState
 from accelerate.utils import gather_object
-
-
-health_mm_llm_data_path = os.environ.get("HEALTH_MM_LLM_DATA", "/capstor/scratch/cscs/ndeperr/code/health_mm_llm")
-if health_mm_llm_data_path not in sys.path:
-    sys.path.append(health_mm_llm_data_path)
     
-from health_mm_llm_data.utils import custom_collate_fn
-from health_mm_llm_data.datasets import (
-    CheX_Dataset_MM,
+from RadVLM.data.utils import custom_collate_fn
+from RadVLM.data.datasets import (
+    CheXpert_Dataset_MM,
     VinDr_CXR_Single_Label_Dataset,
     VinDr_CXR_Dataset,
     MIMIC_Dataset_MM,
     Chest_ImaGenome_Dataset,
-    Object_CXR_Dataset,
     MS_CXR
 )
 
-from models_loading_inference import load_model_and_processor, inference_radialog, inference_llavamed, inference_llavaov, inference_chexagent, inference_maira2_report, inference_maira2_grounding, inference_qwen2vl
-from utils import plot_images_with_Bbox
+from RadVLM.evaluation.models_loading_inference import load_model_and_processor, inference_radialog, inference_llavamed, inference_llavaov, inference_chexagent, inference_maira2_report, inference_maira2_grounding, inference_qwen2vl
+from RadVLM.evaluation.utils import plot_images_with_Bbox
+from RadVLM.evaluation.compute_metrics_tasks import evaluate_results
 
-from compute_metrics_tasks import evaluate_results
+from RadVLM import DATA_DIR
 
-
-# Constants for directories (consider making these command-line arguments or config)
-DATA_DIR = os.environ.get('DATA_DIR')
-if DATA_DIR is None:
-    raise EnvironmentError("The environment variable 'DATA_DIR' is not set.")
 script_dir = os.path.dirname(os.path.abspath(__file__))
 RESULTS_DIR = os.path.join(script_dir, "results")
 
@@ -77,7 +57,7 @@ def load_dataset(task, data_dir):
     """
     if task == "abnormality_classification":
         dataset_path = os.path.join(data_dir, "CheXpert")
-        dataset = CheX_Dataset_MM(datasetpath=dataset_path, split="test", flag_img=False)
+        dataset = CheXpert_Dataset_MM(datasetpath=dataset_path, split="test", flag_img=False)
 
     elif task == "abnormality_grounding":
         dataset_path = os.path.join(data_dir, "VinDr-CXR")

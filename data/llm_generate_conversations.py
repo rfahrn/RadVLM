@@ -1,15 +1,13 @@
 import argparse
 import json
 import os
-import re
-import sys
-from datasets import *
-from utils import process_sbb, inference_gpt4o_with_retry
 from torch.utils.data import random_split
-import random
-import requests
 from multiprocessing import Pool
-import time
+import torch
+
+from RadVLM.data.datasets import *
+from RadVLM.data.utils import process_sbb, inference_gpt4o_with_retry
+from RadVLM import DATA_DIR
 
 
 def create_conversation_dataset(input_dataset, prefix_file_path, output_dir):
@@ -144,7 +142,6 @@ def main():
     output_dir = os.path.join(datasetpath, 'conversations', split, folder_name)
     
     # Ensure reproducibility
-    import torch
     torch.manual_seed(125)
 
     num_chunks = args.num_chunks

@@ -4,14 +4,10 @@ from datasets import *
 from utils import *
 import json
 import os
-from create_instructions import generate_llava_dataset_from_instruction_dataset
-
-
-DATA_DIR = os.environ.get('DATA_DIR')
-if DATA_DIR is None:
-    raise EnvironmentError("The environment variable 'DATA_DIR' is not set.")
-
 from torch.utils.data import ConcatDataset
+from RadVLM.data.create_instructions import generate_llava_dataset_from_instruction_dataset
+from RadVLM import DATA_DIR
+
 # MIMIC-CXR 
 datasetpath_mimic = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG')
 filtered_reports_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG/filtered_reports_new')
@@ -27,7 +23,6 @@ print("")
 
 
 print("MIMIC-CXR classif")
-
 # MIMIC-CXR 
 datasetpath_mimic = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG')
 mimic_dataset_labels = MIMIC_Dataset_MM(datasetpath=datasetpath_mimic,

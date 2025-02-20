@@ -8,15 +8,10 @@ import torch
 import random
 from torch.utils.data import random_split
 
-# Import your GPT4o inference function from utils
-from utils import inference_gpt4o_with_retry
+from RadVLM.data.utils import inference_gpt4o_with_retry
+from RadVLM.data.datasets import MIMIC_Dataset_MM, CheXpertPlus_Dataset
 
-# Example dataset classes – adjust these imports as needed
-from datasets import MIMIC_Dataset_MM, CheXpertPlus_Dataset
 
-###############################################################################
-# Function to process one chunk of the dataset
-###############################################################################
 def extract_findings_for_chunk(input_chunk, prefix_file_path, output_dir, chexpertplus=False):
     """
     Processes a chunk of the dataset, extracting the findings for each sample
@@ -72,18 +67,12 @@ def extract_findings_for_chunk(input_chunk, prefix_file_path, output_dir, chexpe
             with open(output_file_path, 'w') as output_file:
                 output_file.write(generated_text)
 
-###############################################################################
-# Worker function for processing a chunk in parallel
-###############################################################################
+
 def process_chunk(chunk_index, chunk, prefix_file_path, output_dir, api_key, chexpertplus):
-    # Set the API key in this process
-    os.environ['OPENAI_API_KEY'] = api_key
     print(f"Processing chunk {chunk_index} on process {os.getpid()}")
     extract_findings_for_chunk(chunk, prefix_file_path, output_dir, chexpertplus)
 
-###############################################################################
-# Main entry point, with multiprocessing-based chunking
-###############################################################################
+
 def main():
     parser = argparse.ArgumentParser(
         description="Filter reports script with GPT4o inference (parallel processing)."
@@ -106,8 +95,6 @@ def main():
     if DATA_DIR is None:
         raise EnvironmentError("The environment variable 'DATA_DIR' is not set.")
 
-    # Adjust these paths as needed:
-    # DATA_DIR = "/capstor/store/cscs/swissai/a02/health_mm_llm_shared/data"
     script_dir = os.path.dirname(os.path.abspath(__file__))
     prefix_file_path = os.path.join(script_dir, 'prefixes_prompts/prefix_filter_reports.txt')
 

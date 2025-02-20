@@ -18,17 +18,11 @@ import json
 from torchxrayvision.datasets import (
     Dataset,
     normalize,
-    apply_transforms,
     USE_INCLUDED_FILE,
-    CheX_Dataset,
 )
 from PIL import Image
-
-# Add the parent directory to the sys.path to allow absolute imports to work
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from data.create_instructions import *
-from data.utils import *
-
+from RadVLM.data.create_instructions import *
+from RadVLM.data.utils import *
 
 
 
