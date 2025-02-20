@@ -15,22 +15,11 @@ from pathlib import Path
 
 from torchvision.transforms import Compose, Resize, ToTensor, CenterCrop
 
-# Get the absolute path of the current directory
-current_dir = os.path.abspath(os.path.dirname(__file__))
-
-# Construct the absolute path to the 'RaDialog' directory
-ra_dialog_dir = os.path.join(current_dir, "RaDialog")
-
-# Add the 'RaDialog' directory to sys.path if not already present
-if ra_dialog_dir not in sys.path:
-    sys.path.append(ra_dialog_dir)
-
 # radialog imports 
 from RadVLM.evaluation.RaDialog.LLAVA_Biovil.llava.mm_utils import tokenizer_image_token, KeywordsStoppingCriteria, remap_to_uint8
 from RadVLM.evaluation.RaDialog.LLAVA_Biovil.llava.model.builder import load_pretrained_model
 from RadVLM.evaluation.RaDialog.LLAVA_Biovil.llava.conversation import SeparatorStyle, conv_vicuna_v1
 from RadVLM.evaluation.RaDialog.LLAVA_Biovil.llava.constants import IMAGE_TOKEN_INDEX
-
 
 
 
