@@ -26,8 +26,8 @@ from PIL import Image
 
 # Add the parent directory to the sys.path to allow absolute imports to work
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from health_mm_llm_data.create_instructions import *
-from health_mm_llm_data.utils import *
+from data.create_instructions import *
+from data.utils import *
 
 
 
@@ -140,7 +140,7 @@ class PadChest_grounding(Dataset):
 
         if self.flag_img:
             img = imread(sample_info["img_path"])
-            sample["img"] = safe_normalize(img, maxval=255, reshape=True)
+            sample["img"] = normalize(img, maxval=255, reshape=True)
         
         if self.flag_instr:
             sample["instr"] = generate_instruction_phrase_location(

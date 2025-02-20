@@ -5,7 +5,7 @@ from collections import defaultdict
 from collections import Counter
 import torch
 from torch.utils.data import DataLoader
-from data.utils import custom_collate_fn
+from utils import custom_collate_fn
 
 
 def format_boxes(bounding_boxes, num_float=2):
