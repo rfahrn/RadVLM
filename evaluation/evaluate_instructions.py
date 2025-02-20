@@ -39,7 +39,6 @@ from compute_metrics_tasks import evaluate_results
 
 
 # Constants for directories (consider making these command-line arguments or config)
-CHECKPOINTS_DIR = '/capstor/scratch/cscs/ndeperr/checkpoints/'
 DATA_DIR = "/store/swissai/a02/health_mm_llm_shared/data"
 DATA_DIR =  "/capstor/store/cscs/swissai/a02/health_mm_llm_shared/data"
 RESULTS_DIR = "results"
@@ -259,11 +258,7 @@ def ensure_directory_exists(path):
 if __name__ == "__main__":
 
     args = parse_arguments()
-    try:
-        tokenizer, model, processor = load_model_and_processor(args.model_name)
-    except:
-        tokenizer, model, processor = load_model_and_processor(os.path.join(CHECKPOINTS_DIR, args.model_name))
-
+    tokenizer, model, processor = load_model_and_processor(args.model_name)
         
     distributed_state = PartialState()
             
