@@ -39,7 +39,7 @@ else:
 
 input_dataset = MIMIC_Dataset_MM(
     datasetpath = datasetpath,
-    split="test", flag_img=True, 
+    split="test", flag_img=False, 
     flag_lab=True, only_frontal=True, 
     flag_instr=True, 
     filtered_reports_dir=filtered_reports_dir,
