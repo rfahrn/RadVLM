@@ -199,6 +199,12 @@ The tasks that can be evaluated for each model is summarized in the following ta
 | MAIRA-2        |   ✔    |       ✘        |     ✔     |      ✘       |
 | **RadVLM**     |   ✔    |       ✔        |     ✔     |      ✔       |
 
+### Model evaluation for multi-round conversations
+To evaluate a model on the test set of multi-round conversation tasks, execute the following command:
+```
+python -m evaluation.evaluate_conversations.py --api_key [azure_openAI_api_key] --model_name [radialog, llavamed, $CKPT_PATH_RADVLM] --grounding [True, False]
+```
+This will evaluate the model over the questions of the test set of the conversation dataset, by comparing with the ground truth to expected answers. An average score is cumulatively computed over the test dataset iterations. In order to evaluate on the grounded dataset, set the `grounding` argument to `True`.
 
 
 
