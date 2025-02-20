@@ -152,7 +152,7 @@ where `"image"` refers to the absolute path of the image, `"conversations"` cont
 ### Conversion of llava-ov checkpoint to huggingface format 
 A first step consists of converting the RadVLM checkpoint obtained after finetuning llava-onevision on the radiology instruction dataset, following the finetuning section. In the case of a 7B checkpoint, this can be performed by executing the following command: 
 ```
-python convert_llava_onevision_weights_to_hf.py --model_id lmms-lab/llava-onevision-qwen2-7b-si --model_path $CKPT_PATH_RADVLM
+python evaluation/convert_llava_onevision_weights_to_hf.py --model_id lmms-lab/llava-onevision-qwen2-7b-si --model_path $CKPT_PATH_RADVLM
 ```
 The converted HF model will be stored in the same directory as the finetuned checkpoint, with the additional `_hf` suffixe. 
 
@@ -161,6 +161,23 @@ Baseline models used in the paper to compare performance metrics are re-implemen
 ```
 git clone https://huggingface.co/ChantalPellegrini/RaDialog-interactive-radiology-report-generation
 ```
+
+### Model evaluation on single instructions
+All instruction tasks (report generation, abnormality classification, visual grounding) are evaluated on the test sets of the dataloaders provided in the `data` repo. In order to evaluate a specific model (RadVLM or baseline model), execute this command (scaling to number of available GPUs): 
+```
+accelerate launch --num_processes=4 evaluation/evaluate_instructions.py --task [report_generation, abnormality_classification, region_grounding, abnormality_grounding]  --model_name [radialog, llavamed, chexagent, maira2, $CKPT_PATH_RADVLM] 
+```
+The tasks that can be evaluated for each model is summarized in the following table:
+
+| Model          | Report | Classification | Grounding | Conversation |
+|----------------|:------:|:--------------:|:---------:|:------------:|
+| LLaVA-OV       |   ✔    |       ✘        |     ✘     |      ✔       |
+| LLaVA-Med      |   ✔    |       ✘        |     ✘     |      ✔       |
+| RaDialog       |   ✔    |       ✔        |     ✘     |      ✔       |
+| CheXagent      |   ✔    |       ✔        |     ✔     |      ✘       |
+| MAIRA-2        |   ✔    |       ✘        |     ✔     |      ✘       |
+| **RadVLM**     |   ✔    |       ✔        |     ✔     |      ✔       |
+
 
 
 
