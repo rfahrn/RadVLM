@@ -1,23 +1,7 @@
 from sklearn.metrics import precision_recall_fscore_support
 import numpy as np
 import re
-from torchvision.ops import box_iou
-import sys
-import os
-import torch 
-# Add the parent directory to the sys.path to allow absolute imports to work
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-import health_mm_llm_evaluation.vilmedic.utils
-
-from torchmetrics.detection.mean_ap import MeanAveragePrecision
-
-import torch
-import re
-
-from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
-
-
-
+from RadVLM.evaluation.vilmedic.utils import calcAllMetrics_whole
 
 def evaluate_results(task, output, dataset):
     """
@@ -33,48 +17,22 @@ def evaluate_results(task, output, dataset):
     """
     if task in ["object_grounding", "region_grounding", "abnormality_grounding", "abnormality_detection", "phrase_grounding"]:
         metrics = evaluate_boxes(output, avg_iou=True)
+
     elif task == "abnormality_classification":
-        # labels = ["atelectasis", "cardiomegaly", "consolidation", "edema", "pleural effusion"]
-        labels = [element.lower() for element in dataset.pathologies] #+ ["no findings"]
-
+        labels = [element.lower() for element in dataset.pathologies] 
         metrics = evaluate_classification(output, labels)
-    elif task == "report_generation":
-        # f1chexbert = F1CheXbert()
 
+    elif task == "report_generation":
         list_predictions = [item["output"] for item in output]
         list_groundtruth = [item["txt"] for item in output]
-
-
         metrics = evaluate_reports(list_groundtruth, list_predictions)
-    elif task == "vqa":
-        list_predictions = [item["output"] for item in output]
-        list_groundtruth = [item["answer"] for item in output]
-        # Compute accuracy
-        # Smoothing function for BLEU score
-        smoothing = SmoothingFunction().method1
-
-        # Compute accuracy
-        num_equal = sum(1 for pred, gt in zip(list_predictions, list_groundtruth) if pred == gt)
-        accuracy = (num_equal / len(list_groundtruth)) if list_groundtruth else 0
-
-        # Compute BLEU-1 score for each pair and take the average
-        bleu_scores = [
-            sentence_bleu([gt.split()], pred.split(), weights=(1.0, 0, 0, 0), smoothing_function=smoothing)
-            for pred, gt in zip(list_predictions, list_groundtruth)
-        ]
-        average_bleu_1 = sum(bleu_scores) / len(bleu_scores) if bleu_scores else 0
-
-        # Store in dictionary
-        metrics = {
-            "accuracy": accuracy,
-            "average_bleu_1": average_bleu_1
-        }
 
     else:
         raise ValueError(f"Unsupported task: {task}")
     
     for key, value in metrics.items():
         print(f"{key}: {round(float(value)*100, 1)}")
+
     return metrics
 
 
@@ -95,7 +53,7 @@ def evaluate_reports(output_report_list, gt_report_list):
          'chexbert_all_micro': 0.8148148148148148, 'chexbert_all_macro': 0.5476190476190476,
          'chexbert_5_micro': 0.9230769230769231, 'chexbert_5_macro': 0.9333333333333332}
     """
-    metrics = health_mm_llm_evaluation.vilmedic.utils.calcAllMetrics_whole(output_report_list, gt_report_list)
+    metrics = calcAllMetrics_whole(output_report_list, gt_report_list)
 
     return metrics
 
@@ -233,12 +191,6 @@ def evaluate_classification(output_list, labels):
         output_text = output_single["output"].lower()
         predicted_labels = [label for label in labels if label.lower() in output_text]
         actual_labels = [label.lower() for label in output_single["labels"]]
-
-        # Handle the case where there are no findings
-        # if not predicted_labels:
-        #     predicted_labels = ["no findings"]
-        # if not actual_labels:
-        #     actual_labels = ["no findings"]
 
         correct_labels = [label for label in predicted_labels if label in actual_labels]
         incorrect_labels = [label for label in predicted_labels if label not in actual_labels]
