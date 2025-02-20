@@ -147,10 +147,20 @@ This file contains a list of dictionaries, each following this structure:
 where `"image"` refers to the absolute path of the image, `"conversations"` contains the user-assistant instruction (single or multi-turn), and `"id"` is an arbitrary datapoint tag. This structure follows the LLaVA dataset format and can directly be used within their corresponding training script (https://github.com/LLaVA-VL/LLaVA-NeXT/tree/main/scripts/train).
 
 
+## Evaluation 
 
+### Conversion of llava-ov checkpoint to huggingface format 
+A first step consists of converting the RadVLM checkpoint obtained after finetuning llava-onevision on the radiology instruction dataset, following the finetuning section. In the case of a 7B checkpoint, this can be performed by executing the following command: 
+```
+python convert_llava_onevision_weights_to_hf.py --model_id lmms-lab/llava-onevision-qwen2-7b-si --model_path $CKPT_PATH_RADVLM
+```
+The converted HF model will be stored in the same directory as the finetuned checkpoint, with the additional `_hf` suffixe. 
 
-
-
+### Baseline models implementation 
+Baseline models used in the paper to compare performance metrics are re-implemented within this repo, and their corresponding loading and inference scripts are stored in the file `models_loading_inference.py`. For the specific case of RaDialog, an additional command should be executed within this repo: 
+```
+git clone https://huggingface.co/ChantalPellegrini/RaDialog-interactive-radiology-report-generation
+```
 
 
 
