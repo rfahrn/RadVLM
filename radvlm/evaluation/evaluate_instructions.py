@@ -16,7 +16,7 @@ from radvlm.data.datasets import (
     MS_CXR
 )
 
-from radvlm.evaluation.models_loading_inference import load_model_and_processor, inference_radialog, inference_llavamed, inference_llavaov, inference_chexagent, inference_maira2_report, inference_maira2_grounding, inference_qwen2vl
+from radvlm.evaluation.models_loading_inference import load_model_and_processor, inference_radialog, inference_llavamed, inference_llavaov, inference_chexagent, inference_maira2_report, inference_maira2_grounding
 from radvlm.evaluation.utils import plot_images_with_Bbox
 from radvlm.evaluation.compute_metrics_tasks import evaluate_results
 
@@ -219,7 +219,7 @@ def display_sample_outputs(output, num_samples=10):
 
 def ensure_directory_exists(path):
     if not os.path.exists(path):
-        os.makedirs(path)
+        os.makedirs(path, exist_ok=True)
         print(f"Created directory: {path}")
 
 if __name__ == "__main__":

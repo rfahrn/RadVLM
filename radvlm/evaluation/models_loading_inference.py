@@ -15,11 +15,16 @@ from pathlib import Path
 
 from torchvision.transforms import Compose, Resize, ToTensor, CenterCrop
 
+evaluation_dir = os.path.abspath(os.path.dirname(__file__))
+radialog_path = os.path.join(evaluation_dir, "RaDialog")
+if radialog_path not in sys.path:
+    sys.path.append(radialog_path)
+
 # radialog imports 
-from radvlm.evaluation.RaDialog.LLAVA_Biovil.llava.mm_utils import tokenizer_image_token, KeywordsStoppingCriteria, remap_to_uint8
-from radvlm.evaluation.RaDialog.LLAVA_Biovil.llava.model.builder import load_pretrained_model
-from radvlm.evaluation.RaDialog.LLAVA_Biovil.llava.conversation import SeparatorStyle, conv_vicuna_v1
-from radvlm.evaluation.RaDialog.LLAVA_Biovil.llava.constants import IMAGE_TOKEN_INDEX
+from LLAVA_Biovil.llava.mm_utils import tokenizer_image_token, KeywordsStoppingCriteria, remap_to_uint8
+from LLAVA_Biovil.llava.model.builder import load_pretrained_model
+from LLAVA_Biovil.llava.conversation import SeparatorStyle, conv_vicuna_v1
+from LLAVA_Biovil.llava.constants import IMAGE_TOKEN_INDEX
 
 
 
