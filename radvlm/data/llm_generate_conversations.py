@@ -37,9 +37,7 @@ def create_conversation_dataset(input_dataset, prefix_file_path, output_dir):
         # Build prompt
         prompt = prefix_content + "Radiology report: " + report + "\n"
         prompt += "View: " + str(view) + "\n"
-        if sentencesBBox is None or process_sbb(sentencesBBox) == '':
-            continue
-        else:
+        if sentencesBBox is not None and process_sbb(sentencesBBox) != '':
             processed_sbb = process_sbb(sentencesBBox)
             prompt += "Selected observations with bounding boxes coordinates:\n" + processed_sbb + "\n"
         
@@ -106,7 +104,6 @@ def main():
             sentencesBBoxpath = os.path.join(datasetpath_mscxr, 'sentences_and_BBox_mscxr')
             prefix_file_path = os.path.join(script_dir, 'prefixes_prompts/prefix_conv_grounding.txt')
             folder_name = 'grounding'
-            print("Hello")
         else:
             sentencesBBoxpath = None # full MIMIC-CXR dataset
             prefix_file_path = os.path.join(script_dir, 'prefixes_prompts/prefix_conv.txt')
@@ -137,7 +134,7 @@ def main():
 
 
 
-    output_dir = os.path.join(datasetpath, 'conversations_try', split, folder_name)
+    output_dir = os.path.join(datasetpath, 'conversations', split, folder_name)
     os.makedirs(os.path.dirname(output_dir), exist_ok=True)
     
     # Ensure reproducibility
