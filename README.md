@@ -117,10 +117,10 @@ python -m radvlm.data.preprocess_scripts.normalize_mscxr
 ### Generate conversations 
 For MIMIC-CXR, in order to generate the `conversations` directory, we leverage GPT-4o by providing the corresponding prompt contained in `prefixes_prompts`, and execute the following command:
 ``` 
-python -m radvlm.data.llm_filter_reports --api_key [azure_openAI_api_key] --padchest False --split [train,test] --grounding [True, False] --num_chunks [num API calls]
+python -m radvlm.data.llm_filter_reports --api_key [azure_openAI_api_key] --padchest False --split [train,test] --num_chunks [num API calls]
 ```
-This should be performed for both train and test splits, each containing standard and grounded conversations. 
-For PadChest-GR, just set the ` --padchest` argument to True, and only perform it for the train split and grounding argument. 
+This should be performed for both train and test splits, each containing both standard and grounded conversations (setting the `--grounding` flag). 
+For PadChest-GR, set the ` --padchest` flag, and only perform it for the train split and grounding flag. 
 
 ### Create final llava dataset 
 Once the whole dataset architecture is built, in order to construct the instruction dataset as a unique json file in the llava format, execute the following command:
@@ -202,9 +202,9 @@ The tasks that can be evaluated for each model is summarized in the following ta
 ### Model evaluation for multi-round conversations
 To evaluate a model on the test set of multi-round conversation tasks, execute the following command:
 ```
-python -m radvlm.evaluation.evaluate_conversations --api_key [azure_openAI_api_key] --model_name [radialog, llavamed, $CKPT_PATH_RADVLM] --grounding [True, False]
+python -m radvlm.evaluation.evaluate_conversations --api_key [azure_openAI_api_key] --model_name [radialog, llavamed, $CKPT_PATH_RADVLM] 
 ```
-This will evaluate the model over the questions of the test set of the conversation dataset, by comparing with the ground truth to expected answers. An average score is cumulatively computed over the test dataset iterations. In order to evaluate on the grounded dataset, set the `grounding` argument to `True`.
+This will evaluate the model over the questions of the test set of the conversation dataset, by comparing with the ground truth to expected answers. An average score is cumulatively computed over the test dataset iterations. In order to evaluate on the grounded dataset, set the `--grounding` flag.
 
 
 
