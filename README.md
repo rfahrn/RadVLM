@@ -94,9 +94,9 @@ In the above architecture, the files or folders marked with a `*` were not orgin
 - The file `reports.csv` is obtained by following the findings/impression extraction procedure from the [official MIMIC-CXR github](https://github.com/MIT-LCP/mimic-cxr/tree/master/txt). 
 - The `filtered_reports` directory contains text reports filtered by the Azure OpenAI API call of GPT-4o. The reports are stored as txt files, organized by `study_id` (e.g., `53862424.txt`). In order to generate this directory, run the following command:
 ```
-python -m radvlm.data.llm_filter_reports.csv --api_key [azure_openAI_api_key] --split [train,test] --num_chunks [number of parallel API calls] 
+python -m radvlm.data.llm_filter_reports --api_key [azure_openAI_api_key] --split [train,test] --num_chunks [number of parallel API calls] 
 ```
-This command will leverage the GPT-4o prompt stored in `data/prefixes_prompts/prefix_filter_reports.txt` to remove statements referring to previous studies. It should be executed for both `train` and `test` split values, in order to construct both `train` and `test` sets. 
+This command will leverage the GPT-4o prompt stored in `radvlm/data/prefixes_prompts/prefix_filter_reports.txt` to remove statements referring to previous studies. It should be executed for both `train` and `test` split values, in order to construct both `train` and `test` sets. 
 Similarly, for CheXpertPlus, we can construct the `filtered_reports` folder, organized by studies, by executing the following command (only for train split):
 ```
 python radvlm.data.llm_filter_reports.csv --api_key [azure_openAI_api_key] --chexpertplus True --split train --num_chunks [number of parallel API calls] 
@@ -105,19 +105,19 @@ python radvlm.data.llm_filter_reports.csv --api_key [azure_openAI_api_key] --che
 ### Converting dicom to jpg in VinDr-CXR
 The raw dataset of VinDr-CXR provides images in dicom format in folders `train` and `test`. To obtain the jpg images in directories `train_jpg` and `test_jpg`, as well as the files containing the image dimensions `image_resolutions_train.json` and `image_resolutions_test.json`, execute the following command:
 ```
-python -m radvlm.data.preprocess_scripts.dicom2jpg_vindrcxr.py
+python -m radvlm.data.preprocess_scripts.dicom2jpg_vindrcxr
 ```
 
 ### Preprocess grounded phrases in MS-CXR
 We re-organize the MS-CXR dataset by creating one json file per image (following MIMIC-CXR `image_id`), with bounding boxes normalized from 0 to 1. These are contained in the directory `sentences_BBox_mscxr/` that can be obtained by executing:
 ```
-python -m radvlm.data.preprocess_scripts.normalize_mscxr.py
+python -m radvlm.data.preprocess_scripts.normalize_mscxr
 ```
 
 ### Generate conversations 
 For MIMIC-CXR, in order to generate the `conversations` directory, we leverage GPT-4o by providing the corresponding prompt contained in `prefixes_prompts`, and execute the following command:
 ``` 
-python -m radvlm.data.llm_filter_reports.csv --api_key [azure_openAI_api_key] --padchest False --split [train,test] --grounding [True, False] --num_chunks [num API calls]
+python -m radvlm.data.llm_filter_reports --api_key [azure_openAI_api_key] --padchest False --split [train,test] --grounding [True, False] --num_chunks [num API calls]
 ```
 This should be performed for both train and test splits, each containing standard and grounded conversations. 
 For PadChest-GR, just set the ` --padchest` argument to True, and only perform it for the train split and grounding argument. 
@@ -125,7 +125,7 @@ For PadChest-GR, just set the ` --padchest` argument to True, and only perform i
 ### Create final llava dataset 
 Once the whole dataset architecture is built, in order to construct the instruction dataset as a unique json file in the llava format, execute the following command:
 ```
-python -m radvlm.data.create_llava_dataset.py
+python -m radvlm.data.create_llava_dataset
 ```
 This file contains a list of dictionaries, each following this structure:
 ```
@@ -186,7 +186,7 @@ git clone https://huggingface.co/ChantalPellegrini/RaDialog-interactive-radiolog
 ### Model evaluation on single instructions
 All instruction tasks (report generation, abnormality classification, visual grounding) are evaluated on the test sets of the dataloaders provided in the `data` repo. In order to evaluate a specific model (RadVLM or baseline model), execute this command (scaling to number of available GPUs): 
 ```
-accelerate launch --num_processes=4 radvlm.evaluation.evaluate_instructions.py --task [report_generation, abnormality_classification, region_grounding, abnormality_grounding]  --model_name [radialog, llavamed, chexagent, maira2, $CKPT_PATH_RADVLM] 
+accelerate launch --num_processes=4 radvlm.evaluation.evaluate_instructions --task [report_generation, abnormality_classification, region_grounding, abnormality_grounding]  --model_name [radialog, llavamed, chexagent, maira2, $CKPT_PATH_RADVLM] 
 ```
 The tasks that can be evaluated for each model is summarized in the following table:
 
@@ -202,7 +202,7 @@ The tasks that can be evaluated for each model is summarized in the following ta
 ### Model evaluation for multi-round conversations
 To evaluate a model on the test set of multi-round conversation tasks, execute the following command:
 ```
-python -m radvlm.evaluation.evaluate_conversations.py --api_key [azure_openAI_api_key] --model_name [radialog, llavamed, $CKPT_PATH_RADVLM] --grounding [True, False]
+python -m radvlm.evaluation.evaluate_conversations --api_key [azure_openAI_api_key] --model_name [radialog, llavamed, $CKPT_PATH_RADVLM] --grounding [True, False]
 ```
 This will evaluate the model over the questions of the test set of the conversation dataset, by comparing with the ground truth to expected answers. An average score is cumulatively computed over the test dataset iterations. In order to evaluate on the grounded dataset, set the `grounding` argument to `True`.
 
