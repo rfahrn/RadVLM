@@ -85,8 +85,8 @@ def main():
                         help="Number of chunks to split the dataset into (and number of parallel processes).")
     parser.add_argument("--split", choices=['train', 'test'], type=str, required=True,
                         help="The dataset split")
-    parser.add_argument("--grounding", action="store_true",
-                        help="If set, will generate conversation including grounding questions")
+    parser.add_argument("--grounding", type=bool, default=False,
+                    help="Set to True to generate grounded conversations.")
     args = parser.parse_args()
 
     # Optionally, set the API key in the main process as well.

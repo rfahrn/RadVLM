@@ -79,8 +79,8 @@ def main():
     )
     parser.add_argument("--api_key", type=str, required=True,
                         help="Your OpenAI API key.")
-    parser.add_argument("--chexpertplus", action="store_true",
-                        help="If set, will process CheXpertPlus dataset logic (naming by image_id).")
+    parser.add_argument("--chexpertplus", type=bool, default=False,
+                    help="Set to True to process CheXpertPlus dataset logic (naming by image_id).")
     parser.add_argument("--split", choices=['train', 'test'], type=str, required=True,
                         help="The dataset split")
     parser.add_argument("--num_chunks", type=int, default=1,
