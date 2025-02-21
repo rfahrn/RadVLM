@@ -16,11 +16,11 @@ from radvlm.data.datasets import (
     MS_CXR
 )
 
-from RadVLM.evaluation.models_loading_inference import load_model_and_processor, inference_radialog, inference_llavamed, inference_llavaov, inference_chexagent, inference_maira2_report, inference_maira2_grounding, inference_qwen2vl
-from RadVLM.evaluation.utils import plot_images_with_Bbox
-from RadVLM.evaluation.compute_metrics_tasks import evaluate_results
+from radvlm.evaluation.models_loading_inference import load_model_and_processor, inference_radialog, inference_llavamed, inference_llavaov, inference_chexagent, inference_maira2_report, inference_maira2_grounding, inference_qwen2vl
+from radvlm.evaluation.utils import plot_images_with_Bbox
+from radvlm.evaluation.compute_metrics_tasks import evaluate_results
 
-from RadVLM import DATA_DIR
+from radvlm import DATA_DIR
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 RESULTS_DIR = os.path.join(script_dir, "results")
