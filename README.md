@@ -99,7 +99,7 @@ python -m data.llm_filter_reports.csv --api_key [azure_openAI_api_key] --split [
 This command will leverage the GPT-4o prompt stored in `data/prefixes_prompts/prefix_filter_reports.txt` to remove statements referring to previous studies. It should be executed for both `train` and `test` split values, in order to construct both `train` and `test` sets. 
 Similarly, for CheXpertPlus, we can construct the `filtered_reports` folder, organized by studies, by executing the following command (only for train split):
 ```
-python data/llm_filter_reports.csv --api_key [azure_openAI_api_key] --chexpertplus True --split train --num_chunks [number of parallel API calls] 
+python data.llm_filter_reports.csv --api_key [azure_openAI_api_key] --chexpertplus True --split train --num_chunks [number of parallel API calls] 
 ```
 
 ### Converting dicom to jpg in VinDr-CXR
@@ -111,7 +111,7 @@ python -m data.preprocess_scripts.dicom2jpg_vindrcxr.py
 ### Preprocess grounded phrases in MS-CXR
 We re-organize the MS-CXR dataset by creating one json file per image (following MIMIC-CXR `image_id`), with bounding boxes normalized from 0 to 1. These are contained in the directory `sentences_BBox_mscxr/` that can be obtained by executing:
 ```
-python -m data.preprocess_scripts/normalize_mscxr.py
+python -m data.preprocess_scripts.normalize_mscxr.py
 ```
 
 ### Generate conversations 
