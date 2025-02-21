@@ -85,8 +85,10 @@ def main():
                         help="Number of chunks to split the dataset into (and number of parallel processes).")
     parser.add_argument("--split", choices=['train', 'test'], type=str, required=True,
                         help="The dataset split")
-    parser.add_argument("--grounding", type=bool, default=False,
-                    help="Set to True to generate grounded conversations.")
+    parser.add_argument("--grounding", action="store_true",
+                    help="Set this flag to generate grounded conversations.")
+    parser.add_argument("--padchest", action="store_true",
+                    help="Set this flag to generate conversations for padchest dataset.")
     args = parser.parse_args()
 
     # Optionally, set the API key in the main process as well.
@@ -98,12 +100,13 @@ def main():
 
     if not args.padchest:
         datasetpath = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG')
-        filtered_reports_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG/filtered_reports')
+        filtered_reports_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG/filtered_reports_new')
         datasetpath_mscxr = os.path.join(DATA_DIR, 'MS-CXR')
         if args.grounding:
             sentencesBBoxpath = os.path.join(datasetpath_mscxr, 'sentences_and_BBox_mscxr')
             prefix_file_path = os.path.join(script_dir, 'prefixes_prompts/prefix_conv_grounding.txt')
             folder_name = 'grounding'
+            print("Hello")
         else:
             sentencesBBoxpath = None # full MIMIC-CXR dataset
             prefix_file_path = os.path.join(script_dir, 'prefixes_prompts/prefix_conv.txt')
@@ -134,7 +137,7 @@ def main():
 
 
 
-    output_dir = os.path.join(datasetpath, 'conversations', split, folder_name)
+    output_dir = os.path.join(datasetpath, 'conversations_try', split, folder_name)
     os.makedirs(os.path.dirname(output_dir), exist_ok=True)
     
     # Ensure reproducibility

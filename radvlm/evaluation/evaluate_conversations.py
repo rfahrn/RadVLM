@@ -15,8 +15,8 @@ from radvlm import DATA_DIR
 parser = argparse.ArgumentParser(description="A script to evaluate conversations with GPT-4o.")
 parser.add_argument("--api_key", type=str, required=True,
                         help="Your OpenAI API key.")
-parser.add_argument("--grounding", type=bool, default=False,
-                    help="Set to True to evaluate grounded conversations")
+parser.add_argument("--grounding", action="store_true",
+                    help="Set this flag to evaluate grounded conversations")
 parser.add_argument('--model_name', type=str, default='radialog', help="The VLM to evaluate")
 args = parser.parse_args()
 
