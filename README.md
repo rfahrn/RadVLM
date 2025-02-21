@@ -99,7 +99,7 @@ python -m radvlm.data.llm_filter_reports --api_key [azure_openAI_api_key] --spli
 This command will leverage the GPT-4o prompt stored in `radvlm/data/prefixes_prompts/prefix_filter_reports.txt` to remove statements referring to previous studies. It should be executed for both `train` and `test` split values, in order to construct both `train` and `test` sets. 
 Similarly, for CheXpertPlus, we can construct the `filtered_reports` folder, organized by studies, by executing the following command (only for train split):
 ```
-python radvlm.data.llm_filter_reports.csv --api_key [azure_openAI_api_key] --chexpertplus True --split train --num_chunks [number of parallel API calls] 
+python radvlm.data.llm_filter_reports --api_key [azure_openAI_api_key] --chexpertplus True --split train --num_chunks [number of parallel API calls] 
 ```
 
 ### Converting dicom to jpg in VinDr-CXR
