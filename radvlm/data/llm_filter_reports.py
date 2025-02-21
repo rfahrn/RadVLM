@@ -117,6 +117,8 @@ def main():
             only_frontal=True
         )
         output_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG/filtered_reports')
+    
+    os.makedirs(os.path.dirname(output_dir), exist_ok=True)
 
     print("Total dataset size:", len(dataset))
     torch.manual_seed(11)

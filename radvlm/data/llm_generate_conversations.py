@@ -125,7 +125,7 @@ def main():
         print(f"Total dataset size: {len(dataset)}")
     else:
         datasetpath = os.path.join(DATA_DIR, 'PadChest')
-        split = 'valid' 
+        split = 'train' 
         dataset = PadChest_grounding_per_image(
             datasetpath=datasetpath,
             split=split, 
@@ -135,6 +135,7 @@ def main():
 
 
     output_dir = os.path.join(datasetpath, 'conversations', split, folder_name)
+    os.makedirs(os.path.dirname(output_dir), exist_ok=True)
     
     # Ensure reproducibility
     torch.manual_seed(125)

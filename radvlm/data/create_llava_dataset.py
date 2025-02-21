@@ -145,17 +145,16 @@ print("")
 # CONVERSATIONS
 print("Conversations standard")
 
-conversation_dir= os.path.join(datasetpath_chestima, 'conversations/train/standard')
-
-conv_dataset_standard = Chest_ImaGenome_Dataset(
+conversation_dir= os.path.join(datasetpath_mimic, 'conversations/train/standard')
+filtered_reports_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG/filtered_reports_new')
+conv_dataset_standard = MIMIC_Dataset_MM(
     datasetpath=datasetpath_mimic,
-    datasetpath_chestima=datasetpath_chestima,
     split="train", 
     flag_img=False, 
     flag_instr=False, 
     flag_txt=False, 
     flag_lab=False, 
-    pick_one_region=True,
+    filtered_reports_dir=filtered_reports_dir,
     conversation_dir=conversation_dir
     )
 print("Num samples = " + str(len(conv_dataset_standard)))
@@ -183,7 +182,7 @@ print("")
 print("Conversations grounded padchest")
 datasetpath = os.path.join(DATA_DIR, 'PadChest')
 split_train = 'train'
-conversation_dir = os.path.join(datasetpath, 'conversations/train/padchest')
+conversation_dir = os.path.join(datasetpath, 'conversations/train/grounding')
 dataset_train = PadChest_grounding_per_image(
     datasetpath=datasetpath,
     split=split_train,
@@ -193,7 +192,7 @@ dataset_train = PadChest_grounding_per_image(
 )
 # Create the validation dataset.
 split_valid = 'valid'
-conversation_dir = os.path.join(datasetpath, 'conversations/valid/padchest')
+conversation_dir = os.path.join(datasetpath, 'conversations/train/grounding')
 # If your valid conversation files are in a different folder, set it accordingly.
 dataset_valid = PadChest_grounding_per_image(
     datasetpath=datasetpath,
@@ -318,8 +317,10 @@ dataset_info = [
 ]
 
 train_llava_dataset = generate_llava_dataset_from_instruction_dataset(dataset_info)
+script_dir = os.path.dirname(os.path.abspath(__file__))
+save_path = os.path.join(script_dir, 'llava_datasets', 'all_train.json')
+os.makedirs(os.path.dirname(save_path), exist_ok=True)
 
-save_path = os.path.join('llava_datasets', 'all_train.json')
 with open(save_path, "w") as f:
     json.dump(train_llava_dataset, f, indent=4)
 
