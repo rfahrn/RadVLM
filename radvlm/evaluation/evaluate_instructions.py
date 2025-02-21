@@ -6,8 +6,8 @@ from torch.utils.data import DataLoader, DistributedSampler
 from accelerate import PartialState
 from accelerate.utils import gather_object
     
-from RadVLM.data.utils import custom_collate_fn
-from RadVLM.data.datasets import (
+from radvlm.data.utils import custom_collate_fn
+from radvlm.data.datasets import (
     CheXpert_Dataset_MM,
     VinDr_CXR_Single_Label_Dataset,
     VinDr_CXR_Dataset,

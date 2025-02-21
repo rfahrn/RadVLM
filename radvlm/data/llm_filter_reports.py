@@ -8,8 +8,8 @@ import torch
 import random
 from torch.utils.data import random_split
 
-from RadVLM.data.utils import inference_gpt4o_with_retry
-from RadVLM.data.datasets import MIMIC_Dataset_MM, CheXpertPlus_Dataset
+from radvlm.data.utils import inference_gpt4o_with_retry
+from radvlm.data.datasets import MIMIC_Dataset_MM, CheXpertPlus_Dataset
 
 
 def extract_findings_for_chunk(input_chunk, prefix_file_path, output_dir, chexpertplus=False):

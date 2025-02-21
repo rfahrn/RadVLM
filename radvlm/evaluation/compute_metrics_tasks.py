@@ -1,7 +1,7 @@
 from sklearn.metrics import precision_recall_fscore_support
 import numpy as np
 import re
-from RadVLM.evaluation.vilmedic.utils import calcAllMetrics_whole
+from radvlm.evaluation.vilmedic.utils import calcAllMetrics_whole
 
 def evaluate_results(task, output, dataset):
     """

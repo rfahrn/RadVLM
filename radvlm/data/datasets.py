@@ -21,8 +21,8 @@ from torchxrayvision.datasets import (
     USE_INCLUDED_FILE,
 )
 from PIL import Image
-from RadVLM.data.create_instructions import *
-from RadVLM.data.utils import *
+from radvlm.data.create_instructions import *
+from radvlm.data.utils import *
 
 
 

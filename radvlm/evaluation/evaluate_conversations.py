@@ -5,11 +5,11 @@ import torch
 import re
 import argparse
 
-from RadVLM.data.utils import  process_sbb
-from RadVLM.data.datasets import  MIMIC_Dataset_MM
-from RadVLM.evaluation.models_loading_inference import load_model_and_processor, inference_radialog, inference_llavaov, inference_llavamed
-from RadVLM.data.utils import inference_gpt4o_with_retry
-from RadVLM import DATA_DIR
+from radvlm.data.utils import  process_sbb
+from radvlm.data.datasets import  MIMIC_Dataset_MM
+from radvlm.evaluation.models_loading_inference import load_model_and_processor, inference_radialog, inference_llavaov, inference_llavamed
+from radvlm.data.utils import inference_gpt4o_with_retry
+from radvlm import DATA_DIR
 
 
 parser = argparse.ArgumentParser(description="A script to evaluate conversations with GPT-4o.")

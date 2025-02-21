@@ -1,12 +1,12 @@
 import torch
 import numpy as np
-from RadVLM.data.datasets import MIMIC_Dataset_MM, CheXpert_Dataset_MM, Chest_ImaGenome_Dataset, MS_CXR, CheXpertPlus_Dataset, PadChest_grounding, PadChest_grounding_per_image, VinDr_CXR_Dataset, VinDr_CXR_Single_Label_Dataset
-from RadVLM.data.utils import *
+from radvlm.data.datasets import MIMIC_Dataset_MM, CheXpert_Dataset_MM, Chest_ImaGenome_Dataset, MS_CXR, CheXpertPlus_Dataset, PadChest_grounding, PadChest_grounding_per_image, VinDr_CXR_Dataset, VinDr_CXR_Single_Label_Dataset
+from radvlm.data.utils import *
 import json
 import os
 from torch.utils.data import ConcatDataset
-from RadVLM.data.create_instructions import generate_llava_dataset_from_instruction_dataset
-from RadVLM import DATA_DIR
+from radvlm.data.create_instructions import generate_llava_dataset_from_instruction_dataset
+from radvlm import DATA_DIR
 
 # MIMIC-CXR 
 datasetpath_mimic = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG')

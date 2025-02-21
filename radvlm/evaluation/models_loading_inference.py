@@ -16,10 +16,10 @@ from pathlib import Path
 from torchvision.transforms import Compose, Resize, ToTensor, CenterCrop
 
 # radialog imports 
-from RadVLM.evaluation.RaDialog.LLAVA_Biovil.llava.mm_utils import tokenizer_image_token, KeywordsStoppingCriteria, remap_to_uint8
-from RadVLM.evaluation.RaDialog.LLAVA_Biovil.llava.model.builder import load_pretrained_model
-from RadVLM.evaluation.RaDialog.LLAVA_Biovil.llava.conversation import SeparatorStyle, conv_vicuna_v1
-from RadVLM.evaluation.RaDialog.LLAVA_Biovil.llava.constants import IMAGE_TOKEN_INDEX
+from radvlm.evaluation.RaDialog.LLAVA_Biovil.llava.mm_utils import tokenizer_image_token, KeywordsStoppingCriteria, remap_to_uint8
+from radvlm.evaluation.RaDialog.LLAVA_Biovil.llava.model.builder import load_pretrained_model
+from radvlm.evaluation.RaDialog.LLAVA_Biovil.llava.conversation import SeparatorStyle, conv_vicuna_v1
+from radvlm.evaluation.RaDialog.LLAVA_Biovil.llava.constants import IMAGE_TOKEN_INDEX
 
 
 

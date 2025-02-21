@@ -5,9 +5,9 @@ from torch.utils.data import random_split
 from multiprocessing import Pool
 import torch
 
-from RadVLM.data.datasets import *
-from RadVLM.data.utils import process_sbb, inference_gpt4o_with_retry
-from RadVLM import DATA_DIR
+from radvlm.data.datasets import *
+from radvlm.data.utils import process_sbb, inference_gpt4o_with_retry
+from radvlm import DATA_DIR
 
 
 def create_conversation_dataset(input_dataset, prefix_file_path, output_dir):
