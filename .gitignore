@@ -4,3 +4,4 @@ radvlm/evaluation/RaDialog/LLAVA_Biovil radvlm/evaluation/RaDialog/README.md rad
 radvlm/evaluation/RaDialog
 radvlm/evaluation/vilmedic
 radvlm/evaluation/vilmedic/*
+__pycache__/
