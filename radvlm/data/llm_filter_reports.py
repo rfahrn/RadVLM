@@ -104,7 +104,7 @@ def main():
         # Use CheXpertPlus dataset logic
         datasetpath = os.path.join(DATA_DIR, 'CheXpertPlus')
         dataset = CheXpertPlus_Dataset(datasetpath=datasetpath, split=split, only_frontal=True, flag_img=False)
-        output_dir = os.path.join(DATA_DIR, 'CheXpertPlus/filtered_reports')
+        output_dir = os.path.join(DATA_DIR, 'CheXpertPlus', 'filtered_reports')
     else:
         # Use MIMIC dataset by default
         datasetpath = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG')
@@ -116,7 +116,7 @@ def main():
             flag_lab=False,
             only_frontal=True
         )
-        output_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG/filtered_reports')
+        output_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG', 'filtered_reports')
     
     os.makedirs(os.path.dirname(output_dir), exist_ok=True)
 
