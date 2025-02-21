@@ -5,3 +5,4 @@ radvlm/evaluation/RaDialog
 radvlm/evaluation/vilmedic
 radvlm/evaluation/vilmedic/*
 __pycache__/
+radvlm/evaluation/vilmedic/**/__pycache__/
