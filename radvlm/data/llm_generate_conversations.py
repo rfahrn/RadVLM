@@ -10,7 +10,7 @@ from radvlm.data.utils import process_sbb, inference_gpt4o_with_retry
 from radvlm import DATA_DIR
 
 
-def create_conversation_dataset(input_dataset, prefix_file_path, output_dir):
+def create_conversation_dataset(input_dataset, prefix_file_path, output_dir, model):
     with open(prefix_file_path, 'r') as file:
         prefix_content = file.read()
 
@@ -44,7 +44,7 @@ def create_conversation_dataset(input_dataset, prefix_file_path, output_dir):
         prompt += "\nConversation in expected format:\n"
         print(prompt)
         
-        generated_text = inference_gpt4o_with_retry(prompt, model='gpt-4o')
+        generated_text = inference_gpt4o_with_retry(prompt, model=model)
         print(generated_text)
         print("--------------------------------------")
 
@@ -77,21 +77,17 @@ def main():
     parser = argparse.ArgumentParser(
         description="Conversation dataset creation script with GPT4o inference."
     )
-    parser.add_argument("--api_key", type=str, required=True,
-                        help="Your OpenAI API key.")
-    parser.add_argument("--num_chunks", type=int, default=1,
-                        help="Number of chunks to split the dataset into (and number of parallel processes).")
+    parser.add_argument("--azure_model", type=str, required=True,
+                        help="The azume model name (gpt-4o, gpt-4o-mini, etc.) used to generate conversations ")
     parser.add_argument("--split", choices=['train', 'test'], type=str, required=True,
                         help="The dataset split")
     parser.add_argument("--grounding", action="store_true",
                     help="Set this flag to generate grounded conversations.")
     parser.add_argument("--padchest", action="store_true",
                     help="Set this flag to generate conversations for padchest dataset.")
+    parser.add_argument("--num_chunks", type=int, default=1,
+                        help="Number of chunks to split the dataset into (and number of parallel processes).")
     args = parser.parse_args()
-
-    # Optionally, set the API key in the main process as well.
-    os.environ['OPENAI_API_KEY'] = args.api_key
-    print("Using OpenAI API key from argument.")
 
     # File paths and dataset configuration (adjust as needed)
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -150,7 +146,7 @@ def main():
     with Pool(processes=num_chunks) as pool:
         pool.starmap(
             process_chunk,
-            [(i, chunks[i], prefix_file_path, output_dir, args.api_key) for i in range(num_chunks)]
+            [(i, chunks[i], prefix_file_path, output_dir, args.azure_model) for i in range(num_chunks)]
         )
 
 

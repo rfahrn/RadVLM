@@ -4,11 +4,10 @@ import torch
 import torchvision.transforms.v2 as transforms
 import pandas as pd
 import time
-from openai import OpenAI
 
 from ensemble_boxes import weighted_boxes_fusion
 
-
+from radvlm import CLIENT
 
 def process_sbb(data):
     # Initialize a dictionary to hold the sentences and their bounding boxes
@@ -48,13 +47,11 @@ def process_sbb(data):
 
 
 def inference_gpt4o_with_retry(prompt, model="gpt-4o", max_retries=30):
-    # Initialize OpenAI client
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
     for attempt in range(max_retries):
         try:
             # Use the OpenAI client to make the request
-            completion = client.chat.completions.create(
+            completion = CLIENT.chat.completions.create(
                 model=model,
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant."},

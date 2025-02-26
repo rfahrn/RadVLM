@@ -13,11 +13,11 @@ from radvlm import DATA_DIR
 
 
 parser = argparse.ArgumentParser(description="A script to evaluate conversations with GPT-4o.")
-parser.add_argument("--api_key", type=str, required=True,
-                        help="Your OpenAI API key.")
 parser.add_argument("--grounding", action="store_true",
                     help="Set this flag to evaluate grounded conversations")
 parser.add_argument('--model_name', type=str, default='radialog', help="The VLM to evaluate")
+parser.add_argument("--azure_model", type=str, required=True,
+                        help="The azume model name (gpt-4o, gpt-4o-mini, etc.) used to generate conversations ")
 args = parser.parse_args()
 
 os.environ['OPENAI_API_KEY'] = args.api_key
@@ -110,7 +110,7 @@ for i in range(len(input_dataset)):
     
     prompt = prompt + "Note: write the overall score (/10) this way, so I can extract it: Overall score: <score>" + "\n"
 
-    generated_text = inference_gpt4o_with_retry(prompt, model='gpt-4o')
+    generated_text = inference_gpt4o_with_retry(prompt, model=args.azure_model)
 
     print("-------------------------------------\n\n\n\n")
 

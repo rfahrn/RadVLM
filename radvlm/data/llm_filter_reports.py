@@ -1,8 +1,5 @@
 import os
-import re
-import sys
 import argparse
-import json
 
 import torch
 import random
@@ -11,8 +8,10 @@ from torch.utils.data import random_split
 from radvlm.data.utils import inference_gpt4o_with_retry
 from radvlm.data.datasets import MIMIC_Dataset_MM, CheXpertPlus_Dataset
 
+from radvlm import DATA_DIR
 
-def extract_findings_for_chunk(input_chunk, prefix_file_path, output_dir, chexpertplus=False):
+
+def extract_findings_for_chunk(input_chunk, prefix_file_path, output_dir, model, chexpertplus=False):
     """
     Processes a chunk of the dataset, extracting the findings for each sample
     and storing them in the specified output folder using GPT4o for inference.
@@ -55,7 +54,7 @@ def extract_findings_for_chunk(input_chunk, prefix_file_path, output_dir, chexpe
         prompt = prefix_content + report + "\n    - Extracted findings:\n"
 
         # Perform inference using GPT4o
-        generated_text = inference_gpt4o_with_retry(prompt, model='gpt-4o')
+        generated_text = inference_gpt4o_with_retry(prompt, model=model)
 
         print("Generated text:")
         print(generated_text)
@@ -77,8 +76,8 @@ def main():
     parser = argparse.ArgumentParser(
         description="Filter reports script with GPT4o inference (parallel processing)."
     )
-    parser.add_argument("--api_key", type=str, required=True,
-                        help="Your OpenAI API key.")
+    parser.add_argument("--azure_model", type=str, required=True,
+                        help="The azume model name (gpt-4o, gpt-4o-mini, etc.) used to generate conversations ")
     parser.add_argument("--chexpertplus", action="store_true",
                     help="Set this flag to process CheXpertPlus dataset logic (naming by image_id).")
     parser.add_argument("--split", choices=['train', 'test'], type=str, required=True,
@@ -87,15 +86,9 @@ def main():
                         help="How many total chunks to split the dataset into (number of parallel processes).")
     args = parser.parse_args()
 
-    # Set the API key in the main process (and it will be passed on to workers)
-    os.environ['OPENAI_API_KEY'] = args.api_key
-    print("Using OpenAI API key from argument.")
-
-    DATA_DIR = os.environ.get('DATA_DIR')
-    if DATA_DIR is None:
-        raise EnvironmentError("The environment variable 'DATA_DIR' is not set.")
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
+    
     prefix_file_path = os.path.join(script_dir, 'prefixes_prompts/prefix_filter_reports.txt')
 
     # Example for MIMIC-CXR:
@@ -137,7 +130,7 @@ def main():
     with Pool(processes=num_chunks) as pool:
         pool.starmap(
             process_chunk,
-            [(i, chunks[i], prefix_file_path, output_dir, args.api_key, args.chexpertplus)
+            [(i, chunks[i], prefix_file_path, output_dir, args.azure_model, args.chexpertplus)
              for i in range(num_chunks)]
         )
 
