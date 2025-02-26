@@ -94,12 +94,12 @@ In the above architecture, the files or folders marked with a `*` were not orgin
 - The file `reports.csv` is obtained by following the findings/impression extraction procedure from the [official MIMIC-CXR github](https://github.com/MIT-LCP/mimic-cxr/tree/master/txt). 
 - The `filtered_reports` directory contains text reports filtered by the Azure OpenAI API call of GPT-4o. The reports are stored as txt files, organized by `study_id` (e.g., `53862424.txt`). In order to generate this directory, run the following command:
 ```
-python -m radvlm.data.llm_filter_reports --api_key [azure_openAI_api_key] --split [train,test] --num_chunks [number of parallel API calls] 
+python -m radvlm.data.llm_filter_reports --azure_model gpt-4o-mini --split [train,test] --num_chunks [number of parallel API calls] 
 ```
 This command will leverage the GPT-4o prompt stored in `radvlm/data/prefixes_prompts/prefix_filter_reports.txt` to remove statements referring to previous studies. It should be executed for both `train` and `test` split values, in order to construct both `train` and `test` sets. 
 Similarly, for CheXpertPlus, we can construct the `filtered_reports` folder, organized by studies, by executing the following command (only for train split):
 ```
-python radvlm.data.llm_filter_reports --api_key [azure_openAI_api_key] --chexpertplus True --split train --num_chunks [number of parallel API calls] 
+python radvlm.data.llm_filter_reports --azure_model gpt-4o-mini --chexpertplus True --split train --num_chunks [number of parallel API calls] 
 ```
 
 ### Converting dicom to jpg in VinDr-CXR
@@ -117,7 +117,7 @@ python -m radvlm.data.preprocess_scripts.normalize_mscxr
 ### Generate conversations 
 For MIMIC-CXR, in order to generate the `conversations` directory, we leverage GPT-4o by providing the corresponding prompt contained in `prefixes_prompts`, and execute the following command:
 ``` 
-python -m radvlm.data.llm_filter_reports --api_key [azure_openAI_api_key] --padchest False --split [train,test] --num_chunks [num API calls]
+python -m radvlm.data.llm_filter_reports --azure_model gpt-4o --padchest False --split [train,test] --num_chunks [num API calls]
 ```
 This should be performed for both train and test splits, each containing both standard and grounded conversations (setting the `--grounding` flag). 
 For PadChest-GR, set the ` --padchest` flag, and only perform it for the train split and grounding flag. 
