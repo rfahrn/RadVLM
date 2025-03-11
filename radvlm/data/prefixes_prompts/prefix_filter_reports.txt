@@ -6,7 +6,7 @@ Please extract and output only the findings from the following radiology report 
     - Comparisons with previous images
     - Which view of the image is provided or analysed 
     - External information not observable in the current X-ray
-* Omit any sentences containing words or phrases like: "unchanged," "comparison," "removed," "since," "previous," "prior," etc.
+* Avoid using words like: "unchanged," "comparison," "removed," "since," "previous," "prior", "change", "increased", etc.
 * Provide only the extracted findings text without any additional comments, explanations, or greetings.
 * If there are no findings to extract, output "None".
 

@@ -620,6 +620,7 @@ class MIMIC_Dataset_MM(Dataset):
         filtered_reports_dir=None,
         sentencesBBoxpath=None,
         conversation_dir=None,
+        genderpath = None,
         classif=False
     ):
 
@@ -699,7 +700,7 @@ class MIMIC_Dataset_MM(Dataset):
             existing_files = set(f.split(".txt")[0] for f in os.listdir(self.filtered_reports_dir) if f.endswith(".txt"))
             
             # Filter the CSV only for those rows where the study_id exists in the set
-            self.csv = self.csv[self.csv['study_id'].astype(str).isin(existing_files)]
+            self.csv = self.csv[~self.csv['study_id'].astype(str).isin(existing_files)]
 
 
         # Get our classes.
@@ -728,6 +729,13 @@ class MIMIC_Dataset_MM(Dataset):
         if self.sentencesBBoxpath is not None:
             filenames = [f.replace('.json', '') for f in os.listdir(self.sentencesBBoxpath)]
             self.csv = self.csv[self.csv['dicom_id'].isin(filenames)]
+
+        self.gender_json_path = genderpath
+        if self.gender_json_path is not None:
+            with open(self.gender_json_path, 'r') as file:
+                self.genders_dict = json.load(file)
+        else:
+            self.genders_dict = None
 
 
     def __len__(self):
@@ -763,8 +771,12 @@ class MIMIC_Dataset_MM(Dataset):
 
         sample["view"] = self.csv.iloc[idx]["ViewPosition"]
 
+        sample["gender"] = None  # default to None
+        if self.genders_dict is not None:
+            sample["gender"] = self.genders_dict.get(dicom_id, None)  # safe lookup
+
         if self.flag_txt or self.flag_instr:
-            if self.filtered_reports_dir is None:  # Get the reports directly from self.csv
+            if True:  # Get the reports directly from self.csv
                 # Directly use idx to access the row as a Series
                 study_row = self.csv.iloc[idx]  # Fetch the row using idx directly
 
@@ -1218,7 +1230,7 @@ class CheXpertPlus_Dataset(CheXpert_Dataset_MM):
                 filename for filename in os.listdir(filtered_reports_dir)
             ]
             self.reports_csv = self.reports_csv[
-                self.reports_csv['path_to_image'].apply(
+                ~self.reports_csv['path_to_image'].apply(
                     lambda x: '_'.join(x.split('/')[:3]) + '.txt'
                 ).isin(available_txt_files)
             ]
@@ -1249,7 +1261,7 @@ class CheXpertPlus_Dataset(CheXpert_Dataset_MM):
             sample["img"] = normalize(img, maxval=255, reshape=True)
 
         if self.flag_txt:
-            if self.filtered_reports_dir is None:
+            if True:
                 columns = [
                     "section_findings",
                     "section_impression",

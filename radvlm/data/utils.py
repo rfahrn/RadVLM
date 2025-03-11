@@ -7,7 +7,40 @@ import time
 
 from ensemble_boxes import weighted_boxes_fusion
 
-from radvlm import CLIENT
+from openai import AzureOpenAI
+from openai import OpenAI
+
+
+def setup_azure_openai():
+
+    api_key = os.environ.get('AZURE_OPENAI_API_KEY')
+    if api_key is None:
+        raise EnvironmentError("The environment variable 'AZURE_OPENAI_API_KEY' is not set.")
+
+    endpoint = os.environ.get('AZURE_OPENAI_ENDPOINT')
+    if endpoint is None:
+        raise EnvironmentError("The environment variable 'AZURE_OPENAI_ENDPOINT' is not set.")
+    
+    api_version = os.environ.get('AZURE_API_VERSION')
+    if api_version is None:
+        raise EnvironmentError("The environment variable 'AZURE_API_VERSION' is not set.")
+
+
+    client = AzureOpenAI(
+            azure_endpoint=endpoint,   # e.g. "https://<your-resource-name>.openai.azure.com"
+            api_key=api_key,           # Your Azure OpenAI key
+            api_version=api_version                            # Example API version (use the one you have)
+        )
+    return client
+
+# def setup_azure_openai():
+#     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+#     return client 
+
+
+
+    
+    
 
 def process_sbb(data):
     # Initialize a dictionary to hold the sentences and their bounding boxes
@@ -46,31 +79,40 @@ def process_sbb(data):
 
 
 
-def inference_gpt4o_with_retry(prompt, model="gpt-4o", max_retries=30):
-
+def inference_gpt4o_with_retry(prompt, client, azure_model, max_retries=20):
     for attempt in range(max_retries):
         try:
             # Use the OpenAI client to make the request
-            completion = CLIENT.chat.completions.create(
-                model=model,
+            completion = client.chat.completions.create(
+                model=azure_model,
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant."},
                     {"role": "user", "content": prompt}
-                ]
+                ],
+                max_tokens=2048,
             )
 
-            # Extract and return the response content
+            # Extract the response content
             response_text = completion.choices[0].message.content
+            # If response_text is None, exit immediately without retrying
+            if response_text is None:
+                print("Response text is None. Aborting retries.")
+                return None
+
             return response_text.strip()
 
         except Exception as e:
+            # If the error is because response_text is None (and .strip() fails), do not retry.
+            if "'NoneType' object has no attribute 'strip'" in str(e):
+                print("Received None response text error. Not retrying further.")
+                return None
+
             print(f"Attempt {attempt + 1}/{max_retries} failed: {e}")
             if attempt < max_retries - 1:
                 time.sleep(2 ** attempt)  # Exponential backoff
             else:
                 print("Max retries reached. Returning None.")
                 return None
-    
 
 
 

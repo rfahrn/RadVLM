@@ -1,17 +1,16 @@
 import os
 import argparse
-
 import torch
 import random
 from torch.utils.data import random_split
+from multiprocessing import Pool
 
-from radvlm.data.utils import inference_gpt4o_with_retry
+from radvlm.data.utils import inference_gpt4o_with_retry, setup_azure_openai
 from radvlm.data.datasets import MIMIC_Dataset_MM, CheXpertPlus_Dataset
-
 from radvlm import DATA_DIR
 
 
-def extract_findings_for_chunk(input_chunk, prefix_file_path, output_dir, model, chexpertplus=False):
+def extract_findings_for_chunk(input_chunk, prefix_file_path, output_dir, client, azure_model, chexpertplus):
     """
     Processes a chunk of the dataset, extracting the findings for each sample
     and storing them in the specified output folder using GPT4o for inference.
@@ -53,8 +52,9 @@ def extract_findings_for_chunk(input_chunk, prefix_file_path, output_dir, model,
         # Create the prompt
         prompt = prefix_content + report + "\n    - Extracted findings:\n"
 
+
         # Perform inference using GPT4o
-        generated_text = inference_gpt4o_with_retry(prompt, model=model)
+        generated_text = inference_gpt4o_with_retry(prompt, client, azure_model)
 
         print("Generated text:")
         print(generated_text)
@@ -62,14 +62,17 @@ def extract_findings_for_chunk(input_chunk, prefix_file_path, output_dir, model,
         # Save the generated text if it is valid
         if not generated_text or "None" in generated_text:
             print("Empty text or 'None' found; skipping save.")
+            with open(output_file_path, 'w') as output_file:
+                output_file.write("None")
         else:
             with open(output_file_path, 'w') as output_file:
                 output_file.write(generated_text)
 
 
-def process_chunk(chunk_index, chunk, prefix_file_path, output_dir, api_key, chexpertplus):
+def process_chunk(chunk_index, chunk, prefix_file_path, output_dir, chexpertplus, azure_model):
     print(f"Processing chunk {chunk_index} on process {os.getpid()}")
-    extract_findings_for_chunk(chunk, prefix_file_path, output_dir, chexpertplus)
+    client = setup_azure_openai()
+    extract_findings_for_chunk(chunk, prefix_file_path, output_dir, client, azure_model, chexpertplus)
 
 
 def main():
@@ -77,40 +80,46 @@ def main():
         description="Filter reports script with GPT4o inference (parallel processing)."
     )
     parser.add_argument("--azure_model", type=str, required=True,
-                        help="The azume model name (gpt-4o, gpt-4o-mini, etc.) used to generate conversations ")
+                        help="The azure model name (gpt-4o, gpt-4o-mini, etc.) used to generate conversations")
     parser.add_argument("--chexpertplus", action="store_true",
-                    help="Set this flag to process CheXpertPlus dataset logic (naming by image_id).")
+                        help="Set this flag to process CheXpertPlus dataset logic (naming by image_id).")
     parser.add_argument("--split", choices=['train', 'test'], type=str, required=True,
                         help="The dataset split")
     parser.add_argument("--num_chunks", type=int, default=1,
                         help="How many total chunks to split the dataset into (number of parallel processes).")
     args = parser.parse_args()
 
-
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    
-    prefix_file_path = os.path.join(script_dir, 'prefixes_prompts/prefix_filter_reports.txt')
+
+    # Initialize the Azure OpenAI client once in the main process
+    client = setup_azure_openai()
+    if args.chexpertplus:
+        prefix_file_path = os.path.join(script_dir, 'prefixes_prompts/prefix_filter_reports_cplus.txt')
+    else:
+        prefix_file_path = os.path.join(script_dir, 'prefixes_prompts/prefix_filter_reports.txt')
 
     # Example for MIMIC-CXR:
     split = args.split
     if args.chexpertplus:
         # Use CheXpertPlus dataset logic
         datasetpath = os.path.join(DATA_DIR, 'CheXpertPlus')
-        dataset = CheXpertPlus_Dataset(datasetpath=datasetpath, split=split, only_frontal=True, flag_img=False)
         output_dir = os.path.join(DATA_DIR, 'CheXpertPlus', 'filtered_reports')
+        dataset = CheXpertPlus_Dataset(datasetpath=datasetpath, split=split, only_frontal=True, flag_img=False, filtered_reports_dir=output_dir)
+
     else:
         # Use MIMIC dataset by default
         datasetpath = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG')
+        output_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG', 'filtered_reports')
         dataset = MIMIC_Dataset_MM(
             datasetpath=datasetpath,
             split=split,
-            filtered_reports_dir=None,
+            filtered_reports_dir=output_dir,
             flag_img=False,
             flag_lab=False,
             only_frontal=True
         )
-        output_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG', 'filtered_reports')
-    
+
+
     os.makedirs(os.path.dirname(output_dir), exist_ok=True)
 
     print("Total dataset size:", len(dataset))
@@ -126,13 +135,14 @@ def main():
     chunks = random_split(dataset, split_sizes)
 
     # Use multiprocessing to process all chunks concurrently
-    from multiprocessing import Pool
     with Pool(processes=num_chunks) as pool:
         pool.starmap(
             process_chunk,
-            [(i, chunks[i], prefix_file_path, output_dir, args.azure_model, args.chexpertplus)
+            [(i, chunks[i], prefix_file_path, output_dir, args.chexpertplus, args.azure_model)
              for i in range(num_chunks)]
         )
 
+
 if __name__ == "__main__":
     main()
+
