@@ -31,16 +31,20 @@ def create_conversation_dataset(input_dataset, prefix_file_path, output_dir, cli
             continue
 
         report = input_dataset[i]['txt']
-        if report is None:
+        if report=='None':
+            print("Report is None")
             continue
 
         sentencesBBox = input_dataset[i].get('sentencesBBox', None)
         view = input_dataset[i].get('view', None)
         gender = input_dataset[i].get('gender', None)
-        gender = 'female' if gender == 'F' else 'male'
+        if gender is not None:
+            gender = 'female' if gender == 'F' else 'male'
+        labels = input_dataset[i]['labels']
 
         # Build the prompt for GPT4o inference
         prompt = prefix_content + "Radiology report: " + report + "\n"
+        prompt += "List of Abnormalities: " + ", ".join(labels) + "\n"
         prompt += "View: " + str(view) + "\n"
         prompt += "Gender: " + str(gender) + "\n"
         if sentencesBBox and process_sbb(sentencesBBox):
@@ -128,7 +132,7 @@ def main():
         print(f"Total dataset size: {len(dataset)}")
     else:
         datasetpath = os.path.join(DATA_DIR, 'PadChest')
-        split = 'train'
+        split = args.split
         dataset = PadChest_grounding_per_image(
             datasetpath=datasetpath,
             split=split,
@@ -137,7 +141,7 @@ def main():
         prefix_file_path = os.path.join(script_dir, 'prefixes_prompts/prefix_conv.txt')
         folder_name = 'padchest'
 
-    output_dir = os.path.join(datasetpath, 'conversations_try', split, folder_name)
+    output_dir = os.path.join(datasetpath, 'conversations', split, folder_name)
     os.makedirs(os.path.dirname(output_dir), exist_ok=True)
 
     # Ensure reproducibility

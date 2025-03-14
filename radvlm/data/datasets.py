@@ -700,7 +700,7 @@ class MIMIC_Dataset_MM(Dataset):
             existing_files = set(f.split(".txt")[0] for f in os.listdir(self.filtered_reports_dir) if f.endswith(".txt"))
             
             # Filter the CSV only for those rows where the study_id exists in the set
-            self.csv = self.csv[~self.csv['study_id'].astype(str).isin(existing_files)]
+            self.csv = self.csv[self.csv['study_id'].astype(str).isin(existing_files)]
 
 
         # Get our classes.
@@ -776,7 +776,7 @@ class MIMIC_Dataset_MM(Dataset):
             sample["gender"] = self.genders_dict.get(dicom_id, None)  # safe lookup
 
         if self.flag_txt or self.flag_instr:
-            if True:  # Get the reports directly from self.csv
+            if self.filtered_reports_dir is None:  # Get the reports directly from self.csv
                 # Directly use idx to access the row as a Series
                 study_row = self.csv.iloc[idx]  # Fetch the row using idx directly
 
