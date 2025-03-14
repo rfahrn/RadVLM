@@ -1,7 +1,7 @@
 # RadVLM
 
 ## Install dependencies
-To install dependencies on the Swiss AI cluster, you can create a Docker file where you execute the following command"
+To install dependencies, execute the following commands:
 ```
 conda create -n radvlm python=3.10 -y
 conda activate radvlm
