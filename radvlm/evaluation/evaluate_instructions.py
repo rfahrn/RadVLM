@@ -69,7 +69,7 @@ def load_dataset(task, data_dir):
         dataset = VinDr_CXR_Dataset(datasetpath=dataset_path, split="test", flag_img = False)
     elif task == "report_generation":
         datasetpath = os.path.join(data_dir, 'MIMIC-CXR-JPG')
-        filtered_reports = os.path.join(data_dir, 'MIMIC-CXR-JPG/filtered_reports_new')
+        filtered_reports = os.path.join(data_dir, 'MIMIC-CXR-JPG/filtered_reports_test')
         dataset = MIMIC_Dataset_MM(
             datasetpath=datasetpath,
             split="test",
