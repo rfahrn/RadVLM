@@ -29,6 +29,8 @@ from LLAVA_Biovil.llava.constants import IMAGE_TOKEN_INDEX
 
 
 
+
+
 def load_model_and_processor(model_name, device_map='cpu'):
 
     processor = None
@@ -58,7 +60,7 @@ def load_model_and_processor(model_name, device_map='cpu'):
         model = model.to(dtype)
         model.eval()
     elif model_name == 'llavamed':
-        from llava_med_loading import register_llava_med_hf
+        from radvlm.evaluation.llava_med_loading import register_llava_med_hf
         model_path = 'microsoft/llava-med-v1.5-mistral-7b'
         register_llava_med_hf()
         model = transformers.AutoModelForCausalLM.from_pretrained(
@@ -98,6 +100,9 @@ def load_model_and_processor(model_name, device_map='cpu'):
             "torch_dtype": torch.float16,
             "low_cpu_mem_usage": True, 
         }
+
+        if model_name == 'llavaov':
+            model_name = 'llava-hf/llava-onevision-qwen2-7b-si-hf'
 
         model = transformers.LlavaOnevisionForConditionalGeneration.from_pretrained(
             model_name,
