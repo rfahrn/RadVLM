@@ -194,7 +194,7 @@ git clone https://huggingface.co/ChantalPellegrini/RaDialog-interactive-radiolog
 ### Model evaluation on single instructions
 All instruction tasks (report generation, abnormality classification, visual grounding) are evaluated on the test sets of the dataloaders provided in the `data` repo. In order to evaluate a specific model (RadVLM or baseline model), execute this command (scaling to number of available GPUs): 
 ```
-accelerate launch --num_processes=4 radvlm.evaluation.evaluate_instructions --task [report_generation, abnormality_classification, region_grounding, abnormality_grounding]  --model_name [radialog, llavamed, chexagent, maira2, $CKPT_PATH_RADVLM] 
+accelerate launch --num_processes=4 radvlm.evaluation.evaluate_instructions --task [report_generation, abnormality_classification, region_grounding, abnormality_grounding]  --model_name [radialog, llavamed, chexagent, maira2, llavaov, $CKPT_PATH_RADVLM] 
 ```
 The tasks that can be evaluated for each model is summarized in the following table:
 
@@ -206,6 +206,11 @@ The tasks that can be evaluated for each model is summarized in the following ta
 | CheXagent      |   ✔    |       ✔        |     ✔     |      ✘       |
 | MAIRA-2        |   ✔    |       ✘        |     ✔     |      ✘       |
 | **RadVLM**     |   ✔    |       ✔        |     ✔     |      ✔       |
+
+To evaluate generated reports with the GREEN metric, after the above command is executed for the `report_generation` task, run the following command:
+```
+torchrun --nproc_per_node=4 -m radvlm.evaluation.eval_green --model_name [radialog,llavamed, chexagent, maira2, llavaov, $CKPT_PATH_RADVLM]
+```
 
 ### Model evaluation for multi-round conversations
 To evaluate a model on the test set of multi-round conversation tasks, execute the following command:
