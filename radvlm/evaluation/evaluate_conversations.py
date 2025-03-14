@@ -8,7 +8,7 @@ import argparse
 from radvlm.data.utils import  process_sbb
 from radvlm.data.datasets import  MIMIC_Dataset_MM
 from radvlm.evaluation.models_loading_inference import load_model_and_processor, inference_radialog, inference_llavaov, inference_llavamed
-from radvlm.data.utils import inference_gpt4o_with_retry
+from radvlm.data.utils import process_sbb, inference_gpt4o_with_retry, setup_azure_openai
 from radvlm import DATA_DIR
 
 
@@ -20,15 +20,14 @@ parser.add_argument("--azure_model", type=str, required=True,
                         help="The azume model name (gpt-4o, gpt-4o-mini, etc.) used to generate conversations ")
 args = parser.parse_args()
 
-os.environ['OPENAI_API_KEY'] = args.api_key
-print("Using OpenAI API key from argument.")
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(script_dir, "results")
 
 split = "test"
 datasetpath = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG')
-filtered_reports_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG/filtered_reports_new')
+gender_file = os.path.join(datasetpath, 'genders.json')
+filtered_reports_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG/filtered_reports')
 
 if args.grounding:
     sentencesBBoxpath = os.path.join(DATA_DIR, 'MS-CXR/sentences_and_BBox_mscxr')
@@ -39,12 +38,13 @@ else:
 
 input_dataset = MIMIC_Dataset_MM(
     datasetpath = datasetpath,
-    split="test", flag_img=False, 
+    split="test", flag_img=True, 
     flag_lab=True, only_frontal=True, 
     flag_instr=True, 
     filtered_reports_dir=filtered_reports_dir,
     sentencesBBoxpath = sentencesBBoxpath,
     conversation_dir=conversation_dir,
+    genderpath=gender_file,
     classif=False,
     seed=0)
 
@@ -71,11 +71,15 @@ for i in range(len(input_dataset)):
     labels = input_dataset[i]['labels']
     report = input_dataset[i]['txt']
     view = input_dataset[i]['view']
+    gender = input_dataset[i]['gender']
+    if gender is not None:
+        gender = 'female' if gender == 'F' else 'male'
     gt_conversation = input_dataset[i]['conversation']
 
     prompt = prefix_content + "List of Abnormalities: " + ", ".join(labels) + "\n"
     prompt = prompt + "Radiology report: " + report + "\n"
     prompt = prompt + "View: " + str(view) + "\n"
+    prompt += "Gender: " + str(gender) + "\n"
     if sentencesBBox is not None:
         processed_sbb = process_sbb(sentencesBBox)
         if processed_sbb is not None:
@@ -87,7 +91,7 @@ for i in range(len(input_dataset)):
         for j in range(len(gt_conversation)):
             if gt_conversation[j]["from"] == "human":
                 question = gt_conversation[j]["value"]
-                prompt = prompt + "User: " + question + "\n"
+                prompt = prompt + "User: " + question + "\n" 
             else:
                 expected_answer = gt_conversation[j]["value"]
                 prompt = prompt + "Expected answer: " + expected_answer + "\n"
@@ -110,7 +114,9 @@ for i in range(len(input_dataset)):
     
     prompt = prompt + "Note: write the overall score (/10) this way, so I can extract it: Overall score: <score>" + "\n"
 
-    generated_text = inference_gpt4o_with_retry(prompt, model=args.azure_model)
+    client = setup_azure_openai()
+
+    generated_text = inference_gpt4o_with_retry(prompt, client, args.azure_model)
 
     print("-------------------------------------\n\n\n\n")
 
@@ -131,35 +137,11 @@ for i in range(len(input_dataset)):
     average_score = np.mean(scores)
     print(f"RUNNING AVERAGE SCORE: {average_score}")
 
-    average_score_file = os.path.join(OUTPUT_DIR, "average_score.txt")
+    average_score_file = os.path.join(OUTPUT_DIR, f"average_score_{args.model_name}.txt")
+
     with open(average_score_file, "w") as f:
         f.write(str(average_score))
 
 
 print("EVALUATION COMPLETED")
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-    
-    
-    
-
-    
-
-        
-    
-
-
 
