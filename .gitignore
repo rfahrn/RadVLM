@@ -7,3 +7,4 @@ radvlm/evaluation/vilmedic/*
 __pycache__/
 radvlm/evaluation/vilmedic/**/__pycache__/
 **/__pycache__/
+*.pyc
