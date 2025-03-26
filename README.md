@@ -15,8 +15,8 @@ The instruction dataset comprises 1,022,742 image-instruction pairs spanning mul
 
 | Task                    | Dataset source    | Image-instruction pairs (#) | Evaluation (#) | DUA                                                                                                                                          |
 |-------------------------|-------------------|-----------------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------|
-| Report Generation       | MIMIC-CXR         | 232,344 × 1                 | 3,282          | [physionet](https://www.physionet.org/content/mimic-cxr-jpg/2.1.0/)                                                                                 |
-|                         | CheXpert-Plus     | 178,368 × 1                 | -              | [stanfordaimi](https://stanfordaimi.azurewebsites.net/datasets/5158c524-d3ab-4e02-96e9-6ee9efc110a1)                                                   |
+| Report Generation       | MIMIC-CXR         | 230,980 × 1                 | 3,314          | [physionet](https://www.physionet.org/content/mimic-cxr-jpg/2.1.0/)                                                                                 |
+|                         | CheXpert-Plus     | 186,463 × 1                 | -              | [stanfordaimi](https://stanfordaimi.azurewebsites.net/datasets/5158c524-d3ab-4e02-96e9-6ee9efc110a1)                                                   |
 | Abnormality classif.    | MIMIC-CXR         | 237,912 × 1                 | 518            | [physionet](https://www.physionet.org/content/mimic-cxr-jpg/2.1.0/)                                                                                 |
 |                         | CheXpert          | 191,027 × 1                 | -              | [stanfordaimi](https://stanfordaimi.azurewebsites.net/datasets/8cbd9ed4-2eb9-4565-affc-111cf4f7ebe2)                                                   |
 | Anatomical grounding    | Chest Imagenome   | 80,000 × 1                  | 2,000          | [physionet](https://physionet.org/content/chest-imagenome/1.0.0/)                                                                                    |
@@ -24,8 +24,8 @@ The instruction dataset comprises 1,022,742 image-instruction pairs spanning mul
 | Abnormality detection   | VinDr-CXR         | 15,000 × 2                  | -              | [physionet](https://physionet.org/content/vindr-cxr/1.0.0/)                                                                                         |
 | Phrase grounding        | MS-CXR            | 971 × 3                     | 189            | [physionet](https://physionet.org/content/ms-cxr/0.1/)                                                                                              |
 |                         | PadChest-GR       | 4,478 × 2                   | -              | [bimcv](https://bimcv.cipf.es/bimcv-projects/padchest-gr/)                                                  |
-| Conversation            | MIMIC-CXR         | 80,312 × 1                  | 523            | [physionet](https://www.physionet.org/content/mimic-cxr-jpg/2.1.0/)                                                                                 |
-| Conversation (grounded) | MS-CXR            | 858 × 4                     | 157            | [physionet](https://physionet.org/content/ms-cxr/0.1/)                                                                                              |
+| Conversation            | MIMIC-CXR         | 86,155 × 1                  | 500            | [physionet](https://www.physionet.org/content/mimic-cxr-jpg/2.1.0/)                                                                                 |
+| Conversation (grounded) | MS-CXR            | 862 × 4                     | 155            | [physionet](https://physionet.org/content/ms-cxr/0.1/)                                                                                              |
 |                         | PadChest-GR       | 2,225 × 4                   | -              | [bimcv](https://bimcv.cipf.es/bimcv-projects/padchest) / [bimcv](https://bimcv.cipf.es/bimcv-projects/padchest-gr/)                                                  |
 
 ### Datasets download 
@@ -181,7 +181,7 @@ conda activate radvlm
 ### Conversion of llava-ov checkpoint to huggingface format 
 A first step consists of converting the RadVLM checkpoint obtained after finetuning llava-onevision on the radiology instruction dataset, following the finetuning section. In the case of a 7B checkpoint, this can be performed by executing the following command: 
 ```
-python -m evaluation.convert_llava_onevision_weights_to_hf.py --model_id lmms-lab/llava-onevision-qwen2-7b-si --model_path $CKPT_PATH_RADVLM
+python -m radvlm.evaluation.convert_llava_onevision_weights_to_hf --model_id lmms-lab/llava-onevision-qwen2-7b-si --model_path $CKPT_PATH_RADVLM
 ```
 The converted HF model will be stored in the same directory as the finetuned checkpoint, with the additional `_hf` suffixe. 
 
