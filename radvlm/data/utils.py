@@ -9,8 +9,6 @@ from ensemble_boxes import weighted_boxes_fusion
 
 from openai import AzureOpenAI
 
-from openai import OpenAI
-
 
 def setup_azure_openai():
 
@@ -35,12 +33,6 @@ def setup_azure_openai():
         )
     return client
 
-
-# def setup_azure_openai():
-#     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-#     return client 
-
-    
     
 
 def process_sbb(data):

@@ -9,8 +9,9 @@ from radvlm.data.create_instructions import generate_llava_dataset_from_instruct
 from radvlm import DATA_DIR
 
 # MIMIC-CXR 
+print("MIMIC-CXR reports")
 datasetpath_mimic = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG')
-filtered_reports_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG/filtered_reports_new')
+filtered_reports_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG/filtered_reports')
 mimic_dataset_filtered = MIMIC_Dataset_MM(datasetpath=datasetpath_mimic,
                                           split="train", 
                                           flag_img=False, flag_lab=False, 
@@ -146,7 +147,7 @@ print("")
 print("Conversations standard")
 
 conversation_dir= os.path.join(datasetpath_mimic, 'conversations/train/standard')
-filtered_reports_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG/filtered_reports_new')
+filtered_reports_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG/filtered_reports')
 conv_dataset_standard = MIMIC_Dataset_MM(
     datasetpath=datasetpath_mimic,
     split="train", 
@@ -164,7 +165,7 @@ print("")
 print("Conversations grounded")
 
 conversation_dir =  os.path.join(datasetpath_mimic, 'conversations/train/grounding') # if present 
-filtered_reports_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG/filtered_reports_new')
+filtered_reports_dir = os.path.join(DATA_DIR, 'MIMIC-CXR-JPG/filtered_reports')
 conv_dataset_grounded = MIMIC_Dataset_MM(
     datasetpath = datasetpath_mimic,
     split="train", flag_img=False, 
