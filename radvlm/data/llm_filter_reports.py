@@ -26,6 +26,7 @@ def extract_findings_for_chunk(input_chunk, prefix_file_path, output_dir, client
         print("----------------------------------------------------")
         # Retrieve the image path
         imgpath = input_chunk[i]['img_path']
+        print(input_chunk[i]['study_id'])
 
         # Name the output file by image_id or study_id
         if chexpertplus:
@@ -62,8 +63,7 @@ def extract_findings_for_chunk(input_chunk, prefix_file_path, output_dir, client
         # Save the generated text if it is valid
         if not generated_text or "None" in generated_text:
             print("Empty text or 'None' found; skipping save.")
-            with open(output_file_path, 'w') as output_file:
-                output_file.write("None")
+            continue
         else:
             with open(output_file_path, 'w') as output_file:
                 output_file.write(generated_text)
@@ -92,7 +92,6 @@ def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
     # Initialize the Azure OpenAI client once in the main process
-    client = setup_azure_openai()
     if args.chexpertplus:
         prefix_file_path = os.path.join(script_dir, 'prefixes_prompts/prefix_filter_reports_cplus.txt')
     else:

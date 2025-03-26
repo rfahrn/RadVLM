@@ -194,6 +194,7 @@ def process_inference_for_single_instruction(tokenizer, model, processor, data_l
 
 def save_results(metrics, model_name, task, num_batches, output=False):
     ensure_directory_exists(RESULTS_DIR)
+    model_name = os.path.basename(model_name)
     filename = f"{model_name}_{task}"
     if output:
         filename = filename + '_output'
@@ -263,8 +264,8 @@ if __name__ == "__main__":
     # Gather results
     distributed_state.wait_for_everyone()
     output = gather_object(output)
-
-    save_results(output, args.model_name, args.task, args.num_batches, output=True)
+    if args.task == "report_generation":
+        save_results(output, args.model_name, args.task, args.num_batches, output=True)
 
 
     # Evaluate and save results

@@ -1484,6 +1484,8 @@ def train(attn_implementation=None):
         )
 
     model = get_model(model_args, training_args, bnb_model_from_pretrained_args)
+
+
     model.config.use_cache = False
     if model_args.rope_scaling_factor is not None and model_args.rope_scaling_type is not None:
         model.config.rope_scaling = {
@@ -1691,6 +1693,7 @@ def train(attn_implementation=None):
                         module = module.to(torch.bfloat16)
 
     data_module = make_supervised_data_module(tokenizer=tokenizer, data_args=data_args)
+
     trainer = LLaVATrainer(model=model, tokenizer=tokenizer, args=training_args, **data_module)
 
     if list(pathlib.Path(training_args.output_dir).glob("checkpoint-*")):
@@ -1700,6 +1703,7 @@ def train(attn_implementation=None):
     trainer.save_state()
 
     model.config.use_cache = True
+    model.gradient_checkpointing_enable({"use_reentrant":False})
 
     if training_args.lora_enable:
         state_dict = get_peft_state_maybe_zero_3(model.named_parameters(), training_args.lora_bias)

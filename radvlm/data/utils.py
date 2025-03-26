@@ -8,6 +8,7 @@ import time
 from ensemble_boxes import weighted_boxes_fusion
 
 from openai import AzureOpenAI
+
 from openai import OpenAI
 
 
@@ -24,6 +25,7 @@ def setup_azure_openai():
     api_version = os.environ.get('AZURE_API_VERSION')
     if api_version is None:
         raise EnvironmentError("The environment variable 'AZURE_API_VERSION' is not set.")
+    
 
 
     client = AzureOpenAI(
@@ -32,6 +34,7 @@ def setup_azure_openai():
             api_version=api_version                            # Example API version (use the one you have)
         )
     return client
+
 
 # def setup_azure_openai():
 #     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))

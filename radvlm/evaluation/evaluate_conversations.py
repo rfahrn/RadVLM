@@ -75,15 +75,15 @@ for i in range(len(input_dataset)):
     if gender is not None:
         gender = 'female' if gender == 'F' else 'male'
     gt_conversation = input_dataset[i]['conversation']
-
-    prompt = prefix_content + "List of Abnormalities: " + ", ".join(labels) + "\n"
-    prompt = prompt + "Radiology report: " + report + "\n"
+    
+    prompt = prefix_content + "Radiology report: " + report + "\n"
+    prompt = prompt + "List of Abnormalities: " + ", ".join(labels) + "\n"
     prompt = prompt + "View: " + str(view) + "\n"
     prompt += "Gender: " + str(gender) + "\n"
     if sentencesBBox is not None:
         processed_sbb = process_sbb(sentencesBBox)
         if processed_sbb is not None:
-            prompt = prompt + "Selected observations with bounding boxes coordinates\n" + processed_sbb + "\n"
+            prompt = prompt + "Selected observations with bounding boxes coordinates:\n" + processed_sbb + "\n"
     prompt = prompt + "Here is the conversation to evaluate: " + "\n\n"
     
     chat_history = [] 
@@ -112,7 +112,7 @@ for i in range(len(input_dataset)):
         print(f"Error during inference at dataset index {i}: {e}")
         continue
     
-    prompt = prompt + "Note: write the overall score (/10) this way, so I can extract it: Overall score: <score>" + "\n"
+    prompt = prompt + "Note: write the overall score (/10) this way, so I can extract it: Overall score: <score>/10" + "\n"
 
     client = setup_azure_openai()
 
@@ -123,21 +123,37 @@ for i in range(len(input_dataset)):
     print(prompt)
     print(imgpath)
     print(generated_text)
-    # Use regular expression to capture the score after "Overall score: "
-    match = re.search(r'Overall score:\s*([\d\.]+)', generated_text)
-    
-    if match:
-        try:
-            score = float(match.group(1))
-            scores.append(score)
-        except ValueError:
-            # Ignore non-numeric outputs
-            pass
-    print(scores)
+    pattern = r'(?i)overall\s*score.*?([\d\.]+)/10'
+
+    # Use DOTALL so ".*?" can span multiple lines if needed
+    matches = re.findall(pattern, generated_text, flags=re.DOTALL)
+
+
+    if matches:
+        for match in matches:
+            try:
+                numeric_score = float(match)
+                # Ensure the numeric score is <= 10
+                if numeric_score <= 10:
+                    scores.append(numeric_score)
+                else:
+                    pass
+            except ValueError:
+                print(f"Non-numeric score encountered: '{match}'")
+    else:
+        print("No valid 'Overall score: X/10' found in the generated text.")
+
+
+    model_name = os.path.basename(args.model_name)
+
     average_score = np.mean(scores)
+    print(scores)
     print(f"RUNNING AVERAGE SCORE: {average_score}")
 
-    average_score_file = os.path.join(OUTPUT_DIR, f"average_score_{args.model_name}.txt")
+    if args.grounding:
+        average_score_file = os.path.join(OUTPUT_DIR, f"average_score_grounding_{model_name}.txt")
+    else:
+        average_score_file = os.path.join(OUTPUT_DIR, f"average_score_{model_name}.txt")
 
     with open(average_score_file, "w") as f:
         f.write(str(average_score))

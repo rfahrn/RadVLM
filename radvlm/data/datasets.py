@@ -1230,7 +1230,7 @@ class CheXpertPlus_Dataset(CheXpert_Dataset_MM):
                 filename for filename in os.listdir(filtered_reports_dir)
             ]
             self.reports_csv = self.reports_csv[
-                ~self.reports_csv['path_to_image'].apply(
+                self.reports_csv['path_to_image'].apply(
                     lambda x: '_'.join(x.split('/')[:3]) + '.txt'
                 ).isin(available_txt_files)
             ]
@@ -1261,7 +1261,7 @@ class CheXpertPlus_Dataset(CheXpert_Dataset_MM):
             sample["img"] = normalize(img, maxval=255, reshape=True)
 
         if self.flag_txt:
-            if True:
+            if self.filtered_reports_dir is None:
                 columns = [
                     "section_findings",
                     "section_impression",
