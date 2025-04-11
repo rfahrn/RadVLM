@@ -101,8 +101,8 @@ def main():
     split = args.split
     if args.chexpertplus:
         # Use CheXpertPlus dataset logic
-        datasetpath = os.path.join(DATA_DIR, 'CheXpertPlus')
-        output_dir = os.path.join(DATA_DIR, 'CheXpertPlus', 'filtered_reports')
+        datasetpath = os.path.join(DATA_DIR, 'CheXpert')
+        output_dir = os.path.join(DATA_DIR, 'CheXpert', 'filtered_reports')
         dataset = CheXpertPlus_Dataset(datasetpath=datasetpath, split=split, only_frontal=True, flag_img=False, filtered_reports_dir=output_dir)
 
     else:
