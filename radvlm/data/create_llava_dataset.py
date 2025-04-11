@@ -47,7 +47,7 @@ print("")
 
 #CheXpert-Plus reports
 print("CheXpert reports")
-datasetpath = os.path.join(DATA_DIR, 'CheXpertPlus')
+datasetpath = os.path.join(DATA_DIR, 'CheXpert')
 filtered_reports_dir = os.path.join(datasetpath, 'filtered_reports')
 chexpertplus_dataset = CheXpertPlus_Dataset(datasetpath=datasetpath, split='train', flag_img=False, filtered_reports_dir=filtered_reports_dir)
 print("Num samples = " + str(len(chexpertplus_dataset)))
