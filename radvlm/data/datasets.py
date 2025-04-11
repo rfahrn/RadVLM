@@ -1249,9 +1249,9 @@ class CheXpertPlus_Dataset(CheXpert_Dataset_MM):
 
         img_path = os.path.join(
             self.datasetpath,
-            'PNG',
-            str(self.reports_csv.iloc[idx]["path_to_image"]).replace(".jpg", ".png")
+            str(self.reports_csv.iloc[idx]["path_to_image"])
         )
+        
         sample["img_path"] = img_path
 
         sample["img"] = np.nan
