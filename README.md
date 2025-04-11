@@ -53,11 +53,8 @@ datasets/
 │   ├── test/
 │   ├── train.csv
 │   ├── valid.csv
-│   └── test.csv
-├── CheXpertPlus/
-│   ├── PNG/
-│   │   ├── train/
-│   │   └── valid/
+│   ├── test.csv
+│   ├── chexbert_labels
 │   ├── df_chexpert_plus_240401.csv
 │   └── filtered_reports/ * 
 ├── CHEST_IMA/
