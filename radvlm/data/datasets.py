@@ -134,7 +134,7 @@ class PadChest_grounding(Dataset):
 
         if self.flag_img:
             img = imread(sample_info["img_path"])
-            sample["img"] = normalize(img, maxval=255, reshape=True)
+            sample["img"] = safe_normalize(img, maxval=255, reshape=True)
         
         if self.flag_instr:
             sample["instr"] = generate_instruction_phrase_location(
@@ -290,17 +290,8 @@ class PadChest_grounding_per_image(Dataset):
 
         if self.flag_img:
             img = imread(sample_info["img_path"])
-            sample["img"] = normalize(img, maxval=255, reshape=True)
+            sample["img"] = safe_normalize(img, maxval=255, reshape=True)
         
-        if self.flag_instr:
-            # Insert your instruction generation logic if desired.
-            instructions = []
-            for item in sample["sentencesBBox"]:
-                # Example placeholder: generate instruction based on box and observation.
-                # instr = generate_instruction_phrase_location(item["box"], item["observation"])
-                # instructions.append(instr)
-                pass
-            sample["instr"] = instructions
 
         # If a conversation file is specified, load the conversation.
         if self.conversation_dir is not None:
