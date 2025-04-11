@@ -154,20 +154,28 @@ def get_img_transforms_mimic(img_size):
     return transform
 
 
-def safe_normalize(img, maxval=255, reshape=False):
-    # Ensure the image is within the expected range [0, maxval]
-    img_max = img.max()
+def safe_normalize(img, maxval, reshape=False):
+    img = img.astype(np.float32)
     
-    if img_max > maxval:
-        # Scale the image down if the max value is too large
-        img = img / img_max * maxval
-    
-    # If reshape is required, handle reshaping here (example: resizing or adding channels)
+    # If the image max is higher than expected, scale it down.
+    current_max = img.max()
+    if current_max > maxval:
+        # Scale the image so that the maximum value is exactly maxval.
+        img = img / current_max * maxval
+
+    # Normalize the image into the range [-1024, 1024]
+    img = (2 * (img / maxval) - 1.) * 1024
+
     if reshape:
-        img = np.reshape(img, (img.shape[0], img.shape[1], 1))  # Example reshape, adjust as needed
-    
-    # Now normalize
-    img = img / maxval  # Normalize the image to [0, 1]
-    
+        # If the image has more than 2 dimensions, take the first channel.
+        if img.ndim > 2:
+            img = img[:, :, 0]
+        # If the image is less than 2D, output an error message.
+        if img.ndim < 2:
+            print("Error: Image dimensions lower than 2.")
+        # Add a channel dimension at the beginning.
+        img = img[None, :, :]
+
     return img
+
 
