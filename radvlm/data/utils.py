@@ -154,4 +154,20 @@ def get_img_transforms_mimic(img_size):
     return transform
 
 
+def safe_normalize(img, maxval=255, reshape=False):
+    # Ensure the image is within the expected range [0, maxval]
+    img_max = img.max()
+    
+    if img_max > maxval:
+        # Scale the image down if the max value is too large
+        img = img / img_max * maxval
+    
+    # If reshape is required, handle reshaping here (example: resizing or adding channels)
+    if reshape:
+        img = np.reshape(img, (img.shape[0], img.shape[1], 1))  # Example reshape, adjust as needed
+    
+    # Now normalize
+    img = img / maxval  # Normalize the image to [0, 1]
+    
+    return img
 
