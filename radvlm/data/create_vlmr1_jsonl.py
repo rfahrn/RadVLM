@@ -81,7 +81,7 @@ def main():
     random.seed(args.seed)
     np.random.seed(args.seed)
 
-    from create_instructions import dataset_info  # Assumes dataset_info defined in that module
+    from radvlm.data.create_instructions import dataset_info  # Assumes dataset_info defined in that module
 
     with open(args.out_file, "w") as fout:
         for block in dataset_info:
