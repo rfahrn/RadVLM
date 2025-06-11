@@ -151,3 +151,11 @@ def main():
 
 if __name__ == '__main__':
     main()
+    """ we now get: which is expected for VLM-R1
+    {"id":"mscXR-train_0",
+ "image":"/cluster/dataset/…/MS-CXR/images_grounding/672613f9-…jpg",
+ "conversations":[
+   {"from":"human","value":"<image>Please show me the location of: right apical pneumothorax"},
+   {"from":"gpt","value":"This phrase can be observed at [0.22,0.19,0.47,0.27] on the image."}
+ ]}
+    """
