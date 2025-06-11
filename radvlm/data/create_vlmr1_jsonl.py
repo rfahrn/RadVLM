@@ -50,7 +50,7 @@ def create_json_cell_vlmr1(sample, id_prefix, idx, strip_root):
     else:
         conv = raw if isinstance(raw, list) else [raw]
         cell = {"id": f"{id_prefix}_{idx}",
-                "image": as_rel(sample["img_path"], strip_root),
+                "image": sample["img_path"],
                 "conversations": []}
         for turn_idx, t in enumerate(conv):
             if not isinstance(t, dict):
