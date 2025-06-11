@@ -36,7 +36,7 @@ def create_json_cell_vlmr1(sample, id_prefix, idx, strip_root):
     # if single dict with question/answer, unfold into two turns
     if isinstance(raw, dict) and "question" in raw and "answer" in raw:
         cell = {"id": f"{id_prefix}_{idx}",
-                "image": as_rel(sample["img_path"], strip_root),
+                "image": sample["img_path"],
                 "conversations": []}
         # human turn
         q = raw["question"].strip()
