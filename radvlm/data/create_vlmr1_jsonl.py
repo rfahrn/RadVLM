@@ -89,7 +89,7 @@ def main():
     
     # Path to your on-disk MS-CXR folder:
     MS_ROOT = os.environ.get("DATA_DIR", "/cluster/dataset/medinfmk/public_radiology_repo") + "/MS-CXR"
-    BBOX_GLOB = os.path.join(MS_ROOT, "sentences_BBox_mscxr", "*.json")
+    BBOX_GLOB = os.path.join(MS_ROOT, "sentences_and_BBox_mscxr", "*.json")
     
     json_files = sorted(glob(BBOX_GLOB))
     custom_dataset = []
