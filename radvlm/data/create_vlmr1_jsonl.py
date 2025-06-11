@@ -28,34 +28,45 @@ def as_rel(path: str, strip_root: str) -> str:
     return os.path.relpath(path, strip_root)
 
 
+
+
 def create_json_cell_vlmr1(sample, id_prefix, idx, strip_root):
-    # Normalize conversation
-    conv = sample.get("conversation", sample.get("instr"))
-    if isinstance(conv, dict):
-        conv = [conv]
-
-    cell = {
-        "id": f"{id_prefix}_{idx}",
-        "image": as_rel(sample["img_path"], strip_root),
-        "conversations": []
-    }
-
-    for turn_idx, t in enumerate(conv):
-        # Determine role/value
-        if "from" in t:
-            role, value = t["from"], t["value"]
-        else:
-            role = "human" if "question" in t else "gpt"
-            value = t.get("question", t.get("answer", ""))
-        # Strip answer tags
-        if role == "gpt":
-            value = value.replace("<answer>", "").replace("</answer>", "").strip()
-        # Prepend image tag on first human turn
-        if turn_idx == 0 and role == "human":
-            value = f"<image>{value.lstrip()}"
-        cell["conversations"].append({"from": role, "value": value})
-    # Optional metadata
-    for k in ("labels", "pathologies"):
+    # support both ChatML and question/answer dicts
+    raw = sample.get("conversation", sample.get("instr"))
+    # if single dict with question/answer, unfold into two turns
+    if isinstance(raw, dict) and "question" in raw and "answer" in raw:
+        cell = {"id": f"{id_prefix}_{idx}",
+                "image": as_rel(sample["img_path"], strip_root),
+                "conversations": []}
+        # human turn
+        q = raw["question"].strip()
+        cell["conversations"].append({
+            "from": "human",
+            "value": f"<image>{q.lstrip()}"
+        })
+        # assistant turn
+        a = raw["answer"].replace("<answer>","").replace("</answer>","").strip()
+        cell["conversations"].append({"from": "gpt", "value": a})
+    else:
+        conv = raw if isinstance(raw, list) else [raw]
+        cell = {"id": f"{id_prefix}_{idx}",
+                "image": as_rel(sample["img_path"], strip_root),
+                "conversations": []}
+        for turn_idx, t in enumerate(conv):
+            if not isinstance(t, dict):
+                continue
+            if "from" in t and "value" in t:
+                role, value = t["from"], t["value"]
+            else:
+                role = "human" if "question" in t else "gpt"
+                value = t.get("question", t.get("answer",""))
+            if role == "gpt":
+                value = value.replace("<answer>","").replace("</answer>","").strip()
+            if turn_idx == 0 and role == "human":
+                value = f"<image>{value.lstrip()}"
+            cell["conversations"].append({"from": role, "value": value})
+    # include optional metadata
+    for k in ("labels","pathologies"):
         if k in sample:
             cell[k] = sample[k]
     return cell
