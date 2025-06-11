@@ -81,7 +81,28 @@ def main():
     random.seed(args.seed)
     np.random.seed(args.seed)
 
-    from radvlm.data.create_instructions import dataset_info  # Assumes dataset_info defined in that module
+    #from radvlm.data.create_instructions import dataset_info  # Assumes dataset_info defined in that module
+    from radvlm.data.datasets import MS_CXR
+    
+    # Path to your on-disk MS-CXR folder:
+    MS_CXR_ROOT = os.environ.get("DATA_DIR",
+        "/cluster/dataset/medinfmk/public_radiology_repo") + "/MS-CXR"
+    
+    dataset_info = [
+        {
+            "dataset": MS_CXR(
+                datasetpath=MS_CXR_ROOT,
+                split="train",
+                flag_img=False,        # JSONL only needs instr, not image tensors
+                flag_instr=True,       # ensure each sample has an "instr" field
+                sentencesBBoxpath=MS_CXR_ROOT + "/sentences_and_BBox_mscxr",
+                conversation_dir=None, # set if you have conv files
+            ),
+            "id_prefix": "mscXR-train",
+            "num_samples": 971 * 3,    # roughly #images × #annotations each
+        },
+        # optionally add a val/test entry here
+    ]
 
     with open(args.out_file, "w") as fout:
         for block in dataset_info:
