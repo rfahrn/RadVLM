@@ -49,7 +49,7 @@ def main():
 
     # locate MS-CXR directories
     ms_root = os.path.join(args.data_dir, "MS-CXR")
-    json_dir = os.path.join(ms_root, "sentences_and_BBox_")
+    json_dir = os.path.join(ms_root, "sentences_and_BBox_mscxr")
     img_root = os.path.join(ms_root, "images_grounding")
 
     # gather grounding JSON files
