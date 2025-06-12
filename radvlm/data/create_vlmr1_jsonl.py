@@ -61,29 +61,41 @@ def make_cell(js_path, data_dir, prefix, idx):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("--data-dir",   required=True,
-                   help="Root of your public_radiology_repo")
+    p.add_argument("--data-dir",   required=True, help="root of public_radiology_repo")
     p.add_argument("--out-file",   default="train.jsonl")
-    p.add_argument("--batch-size", type=int, default=64)
-    p.add_argument("--num-workers",type=int, default=8)
     p.add_argument("--seed",       type=int, default=0)
+    p.add_argument("--shuffle",    action="store_true")
     args = p.parse_args()
 
-    random.seed(args.seed)
-    np.random.seed(args.seed)
+    MS_ROOT = os.path.join(args.data_dir, "MS-CXR")
+    all_files = sorted(glob.glob(f"{MS_ROOT}/sentences_and_BBox_mscxr/*.json"))
+    if args.shuffle:
+        random.seed(args.seed)
+        random.shuffle(all_files)
 
-    ms_root = os.path.join(args.data_dir, "MS-CXR")
-    ann_glob = os.path.join(ms_root, "sentences_and_BBox_mscxr", "*.json")
-    js_files = sorted(glob(ann_glob))
-    prefix   = "mscXR-train"
-
-    # write out JSONL
+    print(f"Found {len(all_files)} JSON samples, writing to {args.out_file}")
     with open(args.out_file, "w") as fout:
-        for idx, js in enumerate(js_files):
-            cell = make_cell(js, args.data_dir, prefix, idx)
-            fout.write(json.dumps(cell, ensure_ascii=False) + "\n")
+        for i, js in enumerate(all_files):
+            data   = json.load(open(js))
+            boxes  = [e["box"] for e in data]
+            phrase = data[0].get("observation","")
+            # image path relative to your --image_folders root
+            img_rel = os.path.join("MS-CXR","images_grounding",
+                                   os.path.basename(js).replace(".json",".jpg"))
+            instr = generate_instruction_phrase_location(boxes, phrase)
+            cell = {
+              "id": f"mscXR-train_{i}",
+              "image": img_rel,
+              "conversations": [
+                {"from":"human","value":f"<image>{instr['question']}"},
+                {"from":"gpt",  "value": instr['answer']}
+              ]
+            }
+            fout.write(json.dumps(cell, ensure_ascii=False)+"\n")
+            if (i+1) % 100 == 0:
+                print(f"  • {i+1}/{len(all_files)} lines written")
 
-    print(f"Wrote {len(js_files)} examples to {args.out_file}")
+    print("✅ Done!")
 
 if __name__=="__main__":
     main()
