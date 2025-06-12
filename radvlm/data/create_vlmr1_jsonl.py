@@ -1,3 +1,11 @@
+
+import sys, os
+
+# assume this file lives at <PROJECT_ROOT>/radvlm/data/create_vlmr1_jsonl.py
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+    
 import os
 import json
 import argparse
