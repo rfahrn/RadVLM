@@ -1,4 +1,17 @@
-#!/usr/bin/env python
+import os, sys
+
+# make sure <PROJECT_ROOT> is on sys.path so that `import radvlm` works:
+SCRIPT_DIR   = os.path.dirname(os.path.realpath(__file__))
+PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..'))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
+# now imports below will find radvlm/
+import json, argparse, random, numpy as np
+from glob import glob
+from torch.utils.data import DataLoader
+from radvlm.data.utils import custom_collate_fn
+from radvlm.data.create_instructions import generate_instruction_phrase_location
 import sys, os, json, argparse, random
 import numpy as np
 from glob import glob
