@@ -10,98 +10,86 @@ if PROJECT_ROOT not in sys.path:
 
 from radvlm.data.create_instructions import generate_instruction_phrase_location
 from radvlm.data.utils import custom_collate_fn
+from torch.utils.data import DataLoader#!/usr/bin/env python
+import os
+import sys
+import json
+import argparse
+import random
+from glob import glob
 from torch.utils.data import DataLoader
+from radvlm.data.utils import custom_collate_fn
+from radvlm.data.create_instructions import generate_instruction_phrase_location
 
+def format_boxes(bboxes, numf=2):
+    fmt = [f"[{round(x1,numf)}, {round(y1,numf)}, {round(x2,numf)}, {round(y2,numf)}]"
+           for x1,y1,x2,y2 in bboxes]
+    if not fmt: return "[]"
+    if len(fmt)==1: return fmt[0]
+    return ", ".join(fmt[:-1]) + " and " + fmt[-1]
 
-def format_boxes(bboxes, num_float=2):
-    strs = [f"[{round(x1,num_float)}, {round(y1,num_float)}, {round(x2,num_float)}, {round(y2,num_float)}]"
-            for x1, y1, x2, y2 in bboxes]
-    if not strs:
-        return "[]"
-    if len(strs) == 1:
-        return strs[0]
-    return ", ".join(strs[:-1]) + " and " + strs[-1]
-
+def build_image_index(image_root):
+    idx = {}
+    for root,_,files in os.walk(image_root):
+        for f in files:
+            if f.lower().endswith(".jpg") or f.lower().endswith(".png"):
+                idx[f] = os.path.join(root, f)
+    return idx
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Generate VLM-R1 JSONL from MS-CXR phrase-grounding annotations"
-    )
-    parser.add_argument(
-        "--data-dir", required=True,
-        help="Root of your public_radiology_repo (contains MS-CXR folder)"
-    )
-    parser.add_argument(
-        "--out-file", default="train.jsonl",
-        help="Output JSONL file path"
-    )
-    parser.add_argument(
-        "--shuffle", action="store_true",
-        help="Shuffle the order of examples"
-    )
-    parser.add_argument(
-        "--seed", type=int, default=0,
-        help="Random seed (for shuffle)"
-    )
-    args = parser.parse_args()
+    p = argparse.ArgumentParser(description="Create VLM-R1 JSONL from MS-CXR grounding")
+    p.add_argument("--data-dir",    required=True,
+                   help="root of public_radiology_repo")
+    p.add_argument("--out-file",    required=True,
+                   help="where to write train.jsonl")
+    p.add_argument("--shuffle",     action="store_true",
+                   help="shuffle examples")
+    p.add_argument("--seed",        type=int, default=0)
+    args = p.parse_args()
 
-    random.seed(args.seed)
+    MS_ROOT       = os.path.join(args.data_dir, "MS-CXR")
+    GLOB_PATTERN  = os.path.join(MS_ROOT, "sentences_and_BBox_mscxr", "*.json")
+    IMG_INDEX_ROOT= os.path.join(args.data_dir, "MIMIC-CXR-JPG", "files")
 
-    # locate MS-CXR directories
-    ms_root = os.path.join(args.data_dir, "MS-CXR")
-    json_dir = os.path.join(ms_root, "sentences_and_BBox_mscxr")
-    img_root = os.path.join(ms_root, "images_grounding")
-
-    # gather grounding JSON files
-    json_paths = sorted(glob.glob(os.path.join(json_dir, "*.json")))
+    # 1) find grounding jsons
+    all_js = sorted(glob(GLOB_PATTERN))
     if args.shuffle:
-        random.shuffle(json_paths)
-    print(f"Found {len(json_paths)} grounding samples.")
+        random.seed(args.seed)
+        random.shuffle(all_js)
+    print(f"Found {len(all_js)} grounding samples.")
 
-    # one-time index of all images
-    print(f"Indexing all JPGs under {img_root}…", end='', flush=True)
-    image_paths = glob.glob(os.path.join(img_root, "**", "*.jpg"), recursive=True)
-    id2img = {os.path.splitext(os.path.basename(p))[0]: p for p in image_paths}
-    print(f" done ({len(image_paths)} images).")
+    # 2) index all real images once
+    print(f"Indexing all images under {IMG_INDEX_ROOT} …", end="", flush=True)
+    img_index = build_image_index(IMG_INDEX_ROOT)
+    print(f" done ({len(img_index)} files).")
 
-    # write JSONL
-    with open(args.out_file, 'w') as fout:
-        for i, js in enumerate(json_paths):
-            data = json.load(open(js, 'r'))
-            # extract boxes & phrase
-            boxes = [e['box'] for e in data]
-            phrase = data[0].get('observation', '')
-
-            # instruction
-            instr = generate_instruction_phrase_location(boxes, phrase)
-
-            # image lookup
-            uuid = os.path.splitext(os.path.basename(js))[0]
-            full_img = id2img.get(uuid)
-            if full_img is None:
-                raise FileNotFoundError(f"No image found for ID {uuid}")
-
-            # make image path relative to --data-dir
+    # 3) stream out JSONL
+    with open(args.out_file, "w") as fout:
+        for i, js in enumerate(all_js):
+            data = json.load(open(js))
+            uuid  = os.path.splitext(os.path.basename(js))[0]
+            img_fn= uuid + ".jpg"
+            if img_fn not in img_index:
+                raise FileNotFoundError(f"No image for ID {uuid} → looked for {img_fn}")
+            full_img = img_index[img_fn]
+            # make path relative to data_dir
             rel_img = os.path.relpath(full_img, args.data_dir)
 
-            # build cell
+            # conv
+            boxes  = [e["box"] for e in data]
+            phrase = data[0].get("observation","")
+            instr  = generate_instruction_phrase_location(boxes, phrase)
+
             cell = {
                 "id": f"mscXR-train_{i}",
                 "image": rel_img,
                 "conversations": [
-                    {"from": "human", "value": f"<image>{instr['question']}"},
-                    {"from": "gpt",   "value": instr['answer']}
+                    {"from":"human", "value":f"<image>{instr['question']}"},
+                    {"from":"gpt",   "value": instr["answer"]}
                 ]
             }
             fout.write(json.dumps(cell, ensure_ascii=False) + "\n")
+            if (i+1) % 100 == 0:
+                print(f"  • wrote {i+1}/{len(all_js)} lines")
 
-            # progress
-            if (i + 1) % 100 == 0:
-                print(f"  • {i+1}/{len(json_paths)} examples written")
-
-    print(f"✅ Wrote {len(json_paths)} examples to {args.out_file}")
-
-
-if __name__ == '__main__':
-    main()
-
+    print("✅ Done.")
