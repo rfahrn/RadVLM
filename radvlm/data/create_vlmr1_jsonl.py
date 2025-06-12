@@ -31,27 +31,40 @@ def as_rel(path: str, strip_root: str) -> str:
 
 
 def create_json_cell_vlmr1(sample, id_prefix, idx, strip_root):
+    # 1) Fix extension
+    img = sample["img_path"]
+    root, ext = os.path.splitext(img)
+    if ext == "":
+        if os.path.exists(root + ".jpg"):
+            img = root + ".jpg"
+        elif os.path.exists(root + ".png"):
+            img = root + ".png"
+    # 2) Make path relative for grpo_jsonl loader
+    img = os.path.relpath(img, strip_root)
+
     # support both ChatML and question/answer dicts
     raw = sample.get("conversation", sample.get("instr"))
-    # if single dict with question/answer, unfold into two turns
+    cell = {
+        "id": f"{id_prefix}_{idx}",
+        "image": img,
+        "conversations": []
+    }
+
+    # single QA dict
     if isinstance(raw, dict) and "question" in raw and "answer" in raw:
-        cell = {"id": f"{id_prefix}_{idx}",
-                "image": sample["img_path"],
-                "conversations": []}
-        # human turn
         q = raw["question"].strip()
         cell["conversations"].append({
             "from": "human",
-            "value": f"<image>{q.lstrip()}"
+            "value": f"<image>{q}"
         })
-        # assistant turn
-        a = raw["answer"].replace("<answer>","").replace("</answer>","").strip()
-        cell["conversations"].append({"from": "gpt", "value": a})
+        a = raw["answer"].replace("<answer>", "").replace("</answer>", "").strip()
+        cell["conversations"].append({
+            "from": "gpt",
+            "value": a
+        })
+
     else:
         conv = raw if isinstance(raw, list) else [raw]
-        cell = {"id": f"{id_prefix}_{idx}",
-                "image": sample["img_path"],
-                "conversations": []}
         for turn_idx, t in enumerate(conv):
             if not isinstance(t, dict):
                 continue
@@ -59,16 +72,18 @@ def create_json_cell_vlmr1(sample, id_prefix, idx, strip_root):
                 role, value = t["from"], t["value"]
             else:
                 role = "human" if "question" in t else "gpt"
-                value = t.get("question", t.get("answer",""))
+                value = t.get("question", t.get("answer", ""))
             if role == "gpt":
-                value = value.replace("<answer>","").replace("</answer>","").strip()
+                value = value.replace("<answer>", "").replace("</answer>", "").strip()
             if turn_idx == 0 and role == "human":
-                value = f"<image>{value.lstrip()}"
+                value = f"<image>{value}"
             cell["conversations"].append({"from": role, "value": value})
-    # include optional metadata
-    for k in ("labels","pathologies"):
+
+    # optional metadata
+    for k in ("labels", "pathologies"):
         if k in sample:
             cell[k] = sample[k]
+
     return cell
 
 
