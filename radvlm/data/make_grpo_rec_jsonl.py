@@ -14,7 +14,7 @@ DATA_DIR       = "/cluster/dataset/medinfmk/public_radiology_repo"
 OUT_DIR        = "/cluster/home/fahrnr/rec_jsonl"
 
 # 3) Which splits to export (must match MS_CXR.split names)
-SPLITS         = ["train", "val", "test"]
+SPLITS         = ["train", "test"]
 
 # 4) Dataloader params
 BATCH_SIZE     = 64
