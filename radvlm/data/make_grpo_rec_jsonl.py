@@ -3,8 +3,8 @@ import os
 import json
 import argparse
 from torch.utils.data import DataLoader
-from radvlm.data.datasets import MS_CXR
-from radvlm.data.utils import custom_collate_fn
+from datasets import MS_CXR
+from utils import custom_collate_fn
 
 def create_grpo_rec_cell(sample, idx, data_root):
     img_rel = os.path.relpath(sample["img_path"], data_root)
