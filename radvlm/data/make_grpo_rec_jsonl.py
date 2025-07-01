@@ -11,7 +11,7 @@ from radvlm.data.utils import custom_collate_fn
 DATA_DIR       = "/capstor/store/cscs/swissai/a02/health_mm_llm_shared/data" #"/cluster/dataset/medinfmk/public_radiology_repo"
 
 # 2) Where to write your output JSONLs (must be writable)
-OUT_DIR        = "/iopsstor/scratch/cscs/rfahrni"  #"/cluster/home/fahrnr/rec_jsonl"
+OUT_DIR        = "/capstor/scratch/cscs/rfahrni"  #"/cluster/home/fahrnr/rec_jsonl"
 
 # 3) Which splits to export (must match MS_CXR.split names)
 SPLITS         = ["train", "test"]
