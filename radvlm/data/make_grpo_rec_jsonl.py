@@ -8,10 +8,10 @@ from radvlm.data.utils import custom_collate_fn
 # ─── USER CONFIG ──────────────────────────────────────────────────────────────
 
 # 1) Root of your public_radiology_repo (contains MIMIC-CXR-JPG and MS-CXR/…)
-DATA_DIR       = "/cluster/dataset/medinfmk/public_radiology_repo"
+DATA_DIR       = "/capstor/store/cscs/swissai/a02/health_mm_llm_shared/data" #"/cluster/dataset/medinfmk/public_radiology_repo"
 
 # 2) Where to write your output JSONLs (must be writable)
-OUT_DIR        = "/cluster/home/fahrnr/rec_jsonl"
+OUT_DIR        = "/iopsstor/scratch/cscs/rfahrni"  #"/cluster/home/fahrnr/rec_jsonl"
 
 # 3) Which splits to export (must match MS_CXR.split names)
 SPLITS         = ["train", "test"]
