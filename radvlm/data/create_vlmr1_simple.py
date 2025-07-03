@@ -128,32 +128,29 @@ def generate_vlmr1_dataset_from_instruction_dataset(dataset_info, base_dir, batc
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate VLM-R1 JSONL datasets from RadVLM (exact same as LLaVA but JSONL format)")
+    parser = argparse.ArgumentParser(description="Generate VLM-R1 JSONL training dataset from RadVLM (exactly like create_llava_dataset.py)")
     parser.add_argument("--data-dir", default=DATA_DIR, help="Root data directory")
     parser.add_argument("--output-dir", default="./vlmr1_datasets", help="Output directory")
-    parser.add_argument("--split", default="train", choices=["train", "test", "both"], 
-                       help="Data split to generate")
+    parser.add_argument("--output-file", default="all_train.jsonl", help="Output JSONL filename")
     parser.add_argument("--batch-size", type=int, default=64, help="Batch size")
     parser.add_argument("--num-workers", type=int, default=8, help="Number of workers")
     parser.add_argument("--seed", type=int, default=0, help="Random seed")
     
     args = parser.parse_args()
     
-    print(f"Generating VLM-R1 dataset...")
+    print(f"Generating VLM-R1 training dataset (same as create_llava_dataset.py)...")
     print(f"Data directory: {args.data_dir}")
     print(f"Output directory: {args.output_dir}")
-    print(f"Split: {args.split}")
     
     # Create output directory
     os.makedirs(args.output_dir, exist_ok=True)
     
-    # Generate training data (exactly like the original create_llava_dataset.py)
-    if args.split in ["train", "both"]:
-        print(f"\n=== GENERATING TRAINING DATA (same as create_llava_dataset.py) ===")
-        
-        # Copy the exact logic from create_llava_dataset.py
-        datasetpath_mimic = os.path.join(args.data_dir, 'MIMIC-CXR-JPG')
-        filtered_reports_dir = os.path.join(args.data_dir, 'MIMIC-CXR-JPG/filtered_reports')
+    # EXACTLY THE SAME LOGIC AS create_llava_dataset.py
+    print(f"=== GENERATING TRAINING DATA (exactly as create_llava_dataset.py) ===")
+    
+    # Copy the exact logic from create_llava_dataset.py
+    datasetpath_mimic = os.path.join(args.data_dir, 'MIMIC-CXR-JPG')
+    filtered_reports_dir = os.path.join(args.data_dir, 'MIMIC-CXR-JPG/filtered_reports')
 
         # MIMIC-CXR reports
         print("MIMIC-CXR reports")
