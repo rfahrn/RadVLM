@@ -130,7 +130,7 @@ def generate_vlmr1_dataset_from_instruction_dataset(dataset_info, base_dir, batc
 def main():
     parser = argparse.ArgumentParser(description="Generate VLM-R1 JSONL datasets from RadVLM (exact same as LLaVA but JSONL format)")
     parser.add_argument("--data-dir", default=DATA_DIR, help="Root data directory")
-    parser.add_argument("--output-dir", default="./vlmr1_datasets", help="Output directory")
+    parser.add_argument("--output-dir", default="/capstor/scratch/cscs/rfahrni/vlmr1_datasets", help="Output directory")
     parser.add_argument("--split", default="train", choices=["train", "test", "both"], 
                        help="Data split to generate")
     parser.add_argument("--batch-size", type=int, default=64, help="Batch size")
