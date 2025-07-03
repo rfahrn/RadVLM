@@ -1,0 +1,11 @@
+torch>=1.9.0
+torchvision>=0.10.0
+numpy>=1.20.0
+pandas>=1.3.0
+Pillow>=8.0.0
+scikit-image>=0.18.0
+scikit-learn>=0.24.0
+torchxrayvision
+pathlib
+json5
+tqdm
