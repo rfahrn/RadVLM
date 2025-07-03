@@ -6,16 +6,16 @@ I've successfully created a comprehensive solution to convert RadVLM datasets to
 
 ### 🎯 Core Scripts
 
-1. **`create_vlmr1_comprehensive.py`** - Main training dataset conversion script
-   - Converts all RadVLM datasets to VLM-R1 format
-   - Supports both single and multi-image scenarios  
-   - Handles all dataset types (MIMIC-CXR, CheXpert, PadChest, VinDr-CXR, etc.)
-   - Flexible output options (individual files or combined)
+1. **`create_vlmr1_simple.py`** ⭐ **RECOMMENDED** - Simple, direct adaptation of RadVLM's `create_llava_dataset.py`
+   - **Exact same datasets as LLaVA** but outputs VLM-R1 JSONL format
+   - Supports `--split train` (training data), `--split test` (validation splits), or `--split both`
+   - **No complex logic** - just converts the output format
+   - Handles all RadVLM dataset types automatically
 
-2. **`create_vlmr1_test.py`** - Test/validation dataset generation script
-   - Creates test splits from available validation data
-   - Same format compatibility as training script
-   - Supports subset of datasets that have test/validation splits
+2. **`create_vlmr1_comprehensive.py`** - Advanced training dataset conversion script
+   - More complex approach with individual dataset configurations
+   - Supports both single and multi-image scenarios  
+   - Flexible output options (individual files or combined)
 
 3. **`validate_vlmr1_jsonl.py`** - Dataset validation and analysis utility
    - Validates JSONL format compliance with VLM-R1 specification
@@ -86,20 +86,20 @@ All RadVLM datasets are supported:
    pip install -r vlmr1_requirements.txt
    ```
 
-2. **Generate Training Data**:
+2. **Generate Training Data** (same as LLaVA but JSONL format):
    ```bash
-   python radvlm/data/create_vlmr1_comprehensive.py \
-       --data-dir /path/to/datasets \
+   python radvlm/data/create_vlmr1_simple.py \
+       --data-dir /capstor/store/cscs/swissai/a135/RadVLM_project/data \
        --output-dir ./vlmr1_datasets \
-       --combine-all
+       --split train
    ```
 
-3. **Generate Test Data**:
+3. **Generate Both Train and Test Data**:
    ```bash
-   python radvlm/data/create_vlmr1_test.py \
-       --data-dir /path/to/datasets \
+   python radvlm/data/create_vlmr1_simple.py \
+       --data-dir /capstor/store/cscs/swissai/a135/RadVLM_project/data \
        --output-dir ./vlmr1_datasets \
-       --combine-all
+       --split both
    ```
 
 4. **Validate Output**:
@@ -113,7 +113,7 @@ All RadVLM datasets are supported:
    ```bash
    python -m open_r1.grpo_jsonl \
        --data_file_paths ./vlmr1_datasets/all_train.jsonl \
-       --image_folders /path/to/datasets/ \
+       --image_folders /capstor/store/cscs/swissai/a135/RadVLM_project/data/ \
        --model_name "Qwen/Qwen2.5-VL-7B-Instruct"
    ```
 
@@ -122,8 +122,8 @@ All RadVLM datasets are supported:
 ```
 /workspace/
 ├── radvlm/data/
-│   ├── create_vlmr1_comprehensive.py   # Main training conversion script
-│   ├── create_vlmr1_test.py           # Test data conversion script  
+│   ├── create_vlmr1_simple.py         # ⭐ RECOMMENDED: Simple VLM-R1 conversion
+│   ├── create_vlmr1_comprehensive.py  # Advanced conversion script
 │   └── validate_vlmr1_jsonl.py        # Validation utility
 ├── VLM-R1_Dataset_README.md           # Detailed usage guide
 ├── vlmr1_requirements.txt             # Python dependencies
