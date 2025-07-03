@@ -456,18 +456,18 @@ if args.split == "train":
     print(f"    --image_folders {args.data_dir}/ \\")
     print(f"    --model_name \"Qwen/Qwen2.5-VL-7B-Instruct\"")
 elif args.split == "both":
-print(f"\n🚀 Usage with VLM-R1:")
+    print(f"\n🚀 Usage with VLM-R1:")
     print(f"# Training:")
     print(f"python -m open_r1.grpo_jsonl \\")
     print(f"    --data_file_paths {train_output_path} \\")
     print(f"    --image_folders {args.data_dir}/ \\")
     print(f"    --model_name \"Qwen/Qwen2.5-VL-7B-Instruct\"")
-    if 'test_output_path' in locals():
-        print(f"\n# Testing:")
-        print(f"python -m open_r1.grpo_jsonl \\")
-        print(f"    --data_file_paths {test_output_path} \\")
-        print(f"    --image_folders {args.data_dir}/ \\")
-        print(f"    --model_name \"Qwen/Qwen2.5-VL-7B-Instruct\"")
+if 'test_output_path' in locals():
+    print(f"\n# Testing:")
+    print(f"python -m open_r1.grpo_jsonl \\")
+    print(f"    --data_file_paths {test_output_path} \\")
+    print(f"    --image_folders {args.data_dir}/ \\")
+    print(f"    --model_name \"Qwen/Qwen2.5-VL-7B-Instruct\"")
 
 
 if __name__ == "__main__":
