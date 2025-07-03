@@ -154,7 +154,7 @@ def main():
 
     # MIMIC-CXR reports
     print("MIMIC-CXR reports")
-mimic_dataset_filtered = MIMIC_Dataset_MM(datasetpath=datasetpath_mimic,
+    mimic_dataset_filtered = MIMIC_Dataset_MM(datasetpath=datasetpath_mimic,
                                           split="train", 
                                           flag_img=False, flag_lab=False, 
                                           only_frontal=True, 
