@@ -160,7 +160,7 @@ def create_task_datasets(data_dir, output_dir, batch_size=64, num_workers=8, see
             "train_dataset": mimic_reports_train,
             "test_dataset": mimic_reports_test
         })
-    except Exception as e:
+    except (PermissionError, FileNotFoundError, Exception) as e:
         print(f"❌ Skipping Report Generation MIMIC: {e}")
 
     # 2. REPORT GENERATION - CheXpert-Plus  
@@ -182,7 +182,7 @@ def create_task_datasets(data_dir, output_dir, batch_size=64, num_workers=8, see
             "train_dataset": chexpert_plus_train,
             "test_dataset": None  # CheXpert-Plus only has training data
         })
-    except Exception as e:
+    except (PermissionError, FileNotFoundError, Exception) as e:
         print(f"❌ Skipping Report Generation CheXpert-Plus: {e}")
 
     # 3. ABNORMALITY CLASSIFICATION - MIMIC-CXR
@@ -215,7 +215,7 @@ def create_task_datasets(data_dir, output_dir, batch_size=64, num_workers=8, see
             "train_dataset": mimic_classif_train,
             "test_dataset": mimic_classif_test
         })
-    except Exception as e:
+    except (PermissionError, FileNotFoundError, Exception) as e:
         print(f"❌ Skipping Classification MIMIC: {e}")
 
     # 4. ABNORMALITY CLASSIFICATION - CheXpert
@@ -234,7 +234,7 @@ def create_task_datasets(data_dir, output_dir, batch_size=64, num_workers=8, see
             "train_dataset": chexpert_train,
             "test_dataset": chexpert_test
         })
-    except Exception as e:
+    except (PermissionError, FileNotFoundError, Exception) as e:
         print(f"❌ Skipping Classification CheXpert: {e}")
 
     # 5. ANATOMICAL GROUNDING - Chest ImaGenome
@@ -273,7 +273,7 @@ def create_task_datasets(data_dir, output_dir, batch_size=64, num_workers=8, see
             "test_dataset": chestima_test,
             "num_samples": 80000  # Limit training samples as in original
         })
-    except Exception as e:
+    except (PermissionError, FileNotFoundError, Exception) as e:
         print(f"❌ Skipping Anatomical Grounding: {e}")
 
     # 6. ABNORMALITY GROUNDING - VinDr-CXR
@@ -292,7 +292,7 @@ def create_task_datasets(data_dir, output_dir, batch_size=64, num_workers=8, see
             "train_dataset": vindr_train,
             "test_dataset": vindr_test
         })
-    except Exception as e:
+    except (PermissionError, FileNotFoundError, Exception) as e:
         print(f"❌ Skipping Abnormality Grounding VinDr: {e}")
 
     # 7. ABNORMALITY DETECTION - VinDr-CXR (Single Label)
@@ -310,7 +310,7 @@ def create_task_datasets(data_dir, output_dir, batch_size=64, num_workers=8, see
             "train_dataset": vindr_mono_train,
             "test_dataset": vindr_mono_test
         })
-    except Exception as e:
+    except (PermissionError, FileNotFoundError, Exception) as e:
         print(f"❌ Skipping Abnormality Detection VinDr: {e}")
 
     # 8. PHRASE GROUNDING - MS-CXR
@@ -343,7 +343,7 @@ def create_task_datasets(data_dir, output_dir, batch_size=64, num_workers=8, see
             "train_dataset": mscxr_train,
             "test_dataset": mscxr_test
         })
-    except Exception as e:
+    except (PermissionError, FileNotFoundError, Exception) as e:
         print(f"❌ Skipping Phrase Grounding MS-CXR: {e}")
 
     # 9. PHRASE GROUNDING - PadChest
@@ -375,7 +375,7 @@ def create_task_datasets(data_dir, output_dir, batch_size=64, num_workers=8, see
             "train_dataset": padchest_train,
             "test_dataset": padchest_test
         })
-    except Exception as e:
+    except (PermissionError, FileNotFoundError, Exception) as e:
         print(f"❌ Skipping Phrase Grounding PadChest: {e}")
 
     # 10. CONVERSATIONS - MIMIC-CXR Standard
@@ -418,7 +418,7 @@ def create_task_datasets(data_dir, output_dir, batch_size=64, num_workers=8, see
             })
         else:
             print("  ❌ Conversation directory not found - skipping")
-    except Exception as e:
+    except (PermissionError, FileNotFoundError, Exception) as e:
         print(f"❌ Skipping Conversations Standard: {e}")
 
     # 11. CONVERSATIONS - MIMIC-CXR Grounded
@@ -463,7 +463,7 @@ def create_task_datasets(data_dir, output_dir, batch_size=64, num_workers=8, see
             })
         else:
             print("  ❌ Grounded conversation directory not found - skipping")
-    except Exception as e:
+    except (PermissionError, FileNotFoundError, Exception) as e:
         print(f"❌ Skipping Conversations Grounded: {e}")
 
     # Now generate JSONL files for each task

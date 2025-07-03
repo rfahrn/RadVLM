@@ -152,43 +152,65 @@ def main():
     datasetpath_mimic = os.path.join(args.data_dir, 'MIMIC-CXR-JPG')
     filtered_reports_dir = os.path.join(args.data_dir, 'MIMIC-CXR-JPG/filtered_reports')
 
+    # Initialize datasets with error handling
+    datasets_created = []
+    
     # MIMIC-CXR reports
-    print("MIMIC-CXR reports")
+    try:
+        print("MIMIC-CXR reports")
         mimic_dataset_filtered = MIMIC_Dataset_MM(datasetpath=datasetpath_mimic,
                                                   split="train", 
                                                   flag_img=False, flag_lab=False, 
                                                   only_frontal=True, 
                                                   filtered_reports_dir=filtered_reports_dir, 
-                                                  seed=0
-                                                 )
-        print("Num samples = " + str(len(mimic_dataset_filtered)))
+                                                  seed=0)
+        print(f"Num samples = {len(mimic_dataset_filtered)}")
+        datasets_created.append(("mimic_dataset_filtered", mimic_dataset_filtered))
+    except (PermissionError, FileNotFoundError, Exception) as e:
+        print(f"❌ Skipping MIMIC-CXR reports: {e}")
+        mimic_dataset_filtered = None
 
-        # MIMIC-CXR classification
+    # MIMIC-CXR classification
+    try:
         print("MIMIC-CXR classif")
         mimic_dataset_labels = MIMIC_Dataset_MM(datasetpath=datasetpath_mimic,
-                                                  split="train", 
-                                                  flag_img=False, flag_lab=True, 
-                                                  only_frontal=True, 
-                                                  filtered_reports_dir=None, 
-                                                  classif=True,
-                                                  seed=0
-                                                 )
-        print("Num samples = " + str(len(mimic_dataset_labels)))
+                                                split="train", 
+                                                flag_img=False, flag_lab=True, 
+                                                only_frontal=True, 
+                                                filtered_reports_dir=None, 
+                                                classif=True,
+                                                seed=0)
+        print(f"Num samples = {len(mimic_dataset_labels)}")
+        datasets_created.append(("mimic_dataset_labels", mimic_dataset_labels))
+    except (PermissionError, FileNotFoundError, Exception) as e:
+        print(f"❌ Skipping MIMIC-CXR classif: {e}")
+        mimic_dataset_labels = None
 
-        # CheXpert 
+    # CheXpert 
+    try:
         print("CheXpert classif")
         dataset_path = os.path.join(args.data_dir, "CheXpert")   
         chexpert_dataset = CheXpert_Dataset_MM(datasetpath=dataset_path,split="train", flag_img=False)
-        print("Num samples = " + str(len(chexpert_dataset)))
+        print(f"Num samples = {len(chexpert_dataset)}")
+        datasets_created.append(("chexpert_dataset", chexpert_dataset))
+    except (PermissionError, FileNotFoundError, Exception) as e:
+        print(f"❌ Skipping CheXpert classif: {e}")
+        chexpert_dataset = None
 
-        # CheXpert-Plus reports
+    # CheXpert-Plus reports
+    try:
         print("CheXpert reports")
         datasetpath = os.path.join(args.data_dir, 'CheXpert')
         filtered_reports_dir_chex = os.path.join(datasetpath, 'filtered_reports')
         chexpertplus_dataset = CheXpertPlus_Dataset(datasetpath=datasetpath, split='train', flag_img=False, filtered_reports_dir=filtered_reports_dir_chex)
-        print("Num samples = " + str(len(chexpertplus_dataset)))
+        print(f"Num samples = {len(chexpertplus_dataset)}")
+        datasets_created.append(("chexpertplus_dataset", chexpertplus_dataset))
+    except (PermissionError, FileNotFoundError, Exception) as e:
+        print(f"❌ Skipping CheXpert reports: {e}")
+        chexpertplus_dataset = None
 
-        # CHEST_IMA
+    # CHEST_IMA
+    try:
         print("Chest-ima")
         datasetpath_chestima = os.path.join(args.data_dir, 'CHEST_IMA')
         chestima_dataset = Chest_ImaGenome_Dataset(
@@ -200,19 +222,35 @@ def main():
             flag_txt=False, 
             flag_lab=False,
             pick_one_region=True,
-            )
-        print("Num samples = " + str(len(chestima_dataset)))
+        )
+        print(f"Num samples = {len(chestima_dataset)}")
+        datasets_created.append(("chestima_dataset", chestima_dataset))
+    except (PermissionError, FileNotFoundError, Exception) as e:
+        print(f"❌ Skipping Chest-ima: {e}")
+        chestima_dataset = None
 
-        # VinDr-CXR
+    # VinDr-CXR
+    try:
         print("VinDr-CXR")
         dataset_path = os.path.join(args.data_dir, "VinDr-CXR") 
         vin_dataset = VinDr_CXR_Dataset(datasetpath=dataset_path, split="train", flag_img = False)
-        print("Num samples = " + str(len(vin_dataset)))
+        print(f"Num samples = {len(vin_dataset)}")
+        datasets_created.append(("vin_dataset", vin_dataset))
+    except (PermissionError, FileNotFoundError, Exception) as e:
+        print(f"❌ Skipping VinDr-CXR: {e}")
+        vin_dataset = None
 
+    try:
+        print("VinDr-CXR mono")
         vin_dataset_mono = VinDr_CXR_Single_Label_Dataset(datasetpath=dataset_path, split="train", flag_img = False)
-        print("Num samples = " + str(len(vin_dataset_mono)))
+        print(f"Num samples = {len(vin_dataset_mono)}")
+        datasets_created.append(("vin_dataset_mono", vin_dataset_mono))
+    except (PermissionError, FileNotFoundError, Exception) as e:
+        print(f"❌ Skipping VinDr-CXR mono: {e}")
+        vin_dataset_mono = None
 
-        # Phrase grounding MS-CXR
+    # Phrase grounding MS-CXR
+    try:
         print("Phrase grounding MS-CXR")
         sentencesBBoxpath = os.path.join(args.data_dir, 'MS-CXR','sentences_and_BBox_mscxr')
 
@@ -233,9 +271,14 @@ def main():
             seed=0)
 
         prhase_grounding_mscxr_dataset = ConcatDataset([dataset_train, dataset_valid])
-        print("Num samples = " + str(len(prhase_grounding_mscxr_dataset)))
+        print(f"Num samples = {len(prhase_grounding_mscxr_dataset)}")
+        datasets_created.append(("prhase_grounding_mscxr_dataset", prhase_grounding_mscxr_dataset))
+    except (PermissionError, FileNotFoundError, Exception) as e:
+        print(f"❌ Skipping Phrase grounding MS-CXR: {e}")
+        prhase_grounding_mscxr_dataset = None
 
-        # Phrase grounding PadChest
+    # Phrase grounding PadChest
+    try:
         print("Phrase grounding PadChest")
         datasetpath_pad = os.path.join(args.data_dir, 'PadChest')
         dataset_train_pad = PadChest_grounding(
@@ -255,9 +298,14 @@ def main():
         )
 
         prhase_grounding_padchest_dataset = ConcatDataset([dataset_train_pad, dataset_valid_pad])
-        print("Num samples = " + str(len(prhase_grounding_padchest_dataset)))
+        print(f"Num samples = {len(prhase_grounding_padchest_dataset)}")
+        datasets_created.append(("prhase_grounding_padchest_dataset", prhase_grounding_padchest_dataset))
+    except (PermissionError, FileNotFoundError, Exception) as e:
+        print(f"❌ Skipping Phrase grounding PadChest: {e}")
+        prhase_grounding_padchest_dataset = None
 
-        # CONVERSATIONS
+    # CONVERSATIONS
+    try:
         print("Conversations standard")
         conversation_dir= os.path.join(datasetpath_mimic, 'conversations/train/standard')
         conv_dataset_standard = None
@@ -272,10 +320,15 @@ def main():
                 filtered_reports_dir=filtered_reports_dir,
                 conversation_dir=conversation_dir
                 )
-            print("Num samples = " + str(len(conv_dataset_standard)))
+            print(f"Num samples = {len(conv_dataset_standard)}")
+            datasets_created.append(("conv_dataset_standard", conv_dataset_standard))
         else:
             print("Conversations standard directory not found - skipping")
+    except (PermissionError, FileNotFoundError, Exception) as e:
+        print(f"❌ Skipping Conversations standard: {e}")
+        conv_dataset_standard = None
 
+    try:
         print("Conversations grounded")
         conversation_dir_grounded =  os.path.join(datasetpath_mimic, 'conversations/train/grounding')
         conv_dataset_grounded = None
@@ -290,10 +343,15 @@ def main():
                 conversation_dir = conversation_dir_grounded,
                 classif=False,
                 seed=0)
-            print("Num samples = " + str(len(conv_dataset_grounded)))
+            print(f"Num samples = {len(conv_dataset_grounded)}")
+            datasets_created.append(("conv_dataset_grounded", conv_dataset_grounded))
         else:
             print("Conversations grounded directory not found - skipping")
+    except (PermissionError, FileNotFoundError, Exception) as e:
+        print(f"❌ Skipping Conversations grounded: {e}")
+        conv_dataset_grounded = None
 
+    try:
         print("Conversations grounded padchest")
         datasetpath_pad = os.path.join(args.data_dir, 'PadChest')
         conversation_dir_pad = os.path.join(datasetpath_pad, 'conversations/train/grounding')
@@ -314,160 +372,108 @@ def main():
                 conversation_dir=conversation_dir_pad
             )
             conv_dataset_grounded_padchest = ConcatDataset([dataset_train_conv, dataset_valid_conv])
-            print("Num samples = " + str(len(conv_dataset_grounded_padchest)))
+            print(f"Num samples = {len(conv_dataset_grounded_padchest)}")
+            datasets_created.append(("conv_dataset_grounded_padchest", conv_dataset_grounded_padchest))
         else:
             print("PadChest conversations grounded directory not found - skipping")
+    except (PermissionError, FileNotFoundError, Exception) as e:
+        print(f"❌ Skipping Conversations grounded padchest: {e}")
+        conv_dataset_grounded_padchest = None
 
-        # Create dataset_info list (exactly like original)
-        dataset_info = [
+    # Create dataset_info list (only for successfully created datasets)
+    dataset_info = []
+    
+    if vin_dataset:
+        dataset_info.extend([
             {"dataset":vin_dataset, "id_prefix":"vindr-cxr-train1"},
             {"dataset":vin_dataset, "id_prefix":"vindr-cxr-train2"},
+        ])
+        
+    if vin_dataset_mono:
+        dataset_info.extend([
             {"dataset":vin_dataset_mono, "id_prefix":"vindr-cxr-mono-train1"},
             {"dataset":vin_dataset_mono, "id_prefix":"vindr-cxr-mono-train2"},
             {"dataset":vin_dataset_mono, "id_prefix":"vindr-cxr-mono-train3"},
+        ])
+        
+    if prhase_grounding_mscxr_dataset:
+        dataset_info.extend([
             {"dataset":prhase_grounding_mscxr_dataset, "id_prefix":"mscxr-train1"},
             {"dataset":prhase_grounding_mscxr_dataset, "id_prefix":"mscxr-train2"},
             {"dataset":prhase_grounding_mscxr_dataset, "id_prefix":"mscxr-train3"},
+        ])
+        
+    if prhase_grounding_padchest_dataset:
+        dataset_info.extend([
             {"dataset":prhase_grounding_padchest_dataset, "id_prefix":"padchest-train1"},
             {"dataset":prhase_grounding_padchest_dataset, "id_prefix":"padchest-train2"},
-            {"dataset":mimic_dataset_filtered, "id_prefix":"mimic-train"},
-            {"dataset":chexpertplus_dataset, "id_prefix":"chexpertplus-train"},
-            {"dataset":chestima_dataset, "id_prefix":"chestima-train", "num_samples":80000},
-            {"dataset":mimic_dataset_labels, "id_prefix":"mimic-labels-train"},
-            {"dataset":chexpert_dataset, "id_prefix":"chexpert-train"},
-        ]
-
-        # Add conversation datasets if they exist
-        if conv_dataset_standard:
-            dataset_info.append({"dataset":conv_dataset_standard, "id_prefix":"conv-train"})
+        ])
         
-        if conv_dataset_grounded:
-            dataset_info.extend([
-                {"dataset":conv_dataset_grounded, "id_prefix":"conv-grounded-train1"},
-                {"dataset":conv_dataset_grounded, "id_prefix":"conv-grounded-train2"},
-                {"dataset":conv_dataset_grounded, "id_prefix":"conv-grounded-train3"},
-                {"dataset":conv_dataset_grounded, "id_prefix":"conv-grounded-train4"},
-            ])
+    if mimic_dataset_filtered:
+        dataset_info.append({"dataset":mimic_dataset_filtered, "id_prefix":"mimic-train"})
         
-        if conv_dataset_grounded_padchest:
-            dataset_info.extend([
-                {"dataset":conv_dataset_grounded_padchest, "id_prefix":"conv-grounded-padchest-train1"},
-                {"dataset":conv_dataset_grounded_padchest, "id_prefix":"conv-grounded-padchest-train2"},
-                {"dataset":conv_dataset_grounded_padchest, "id_prefix":"conv-grounded-padchest-train3"},
-                {"dataset":conv_dataset_grounded_padchest, "id_prefix":"conv-grounded-padchest-train4"},
-            ])
+    if chexpertplus_dataset:
+        dataset_info.append({"dataset":chexpertplus_dataset, "id_prefix":"chexpertplus-train"})
+        
+    if chestima_dataset:
+        dataset_info.append({"dataset":chestima_dataset, "id_prefix":"chestima-train", "num_samples":80000})
+        
+    if mimic_dataset_labels:
+        dataset_info.append({"dataset":mimic_dataset_labels, "id_prefix":"mimic-labels-train"})
+        
+    if chexpert_dataset:
+        dataset_info.append({"dataset":chexpert_dataset, "id_prefix":"chexpert-train"})
 
-        # Generate VLM-R1 training dataset
-        print(f"\nGenerating VLM-R1 training dataset from {len(dataset_info)} configurations...")
-        train_vlmr1_dataset = generate_vlmr1_dataset_from_instruction_dataset(
-            dataset_info, 
-            args.data_dir,
-            batch_size=args.batch_size, 
-            num_workers=args.num_workers, 
-            seed=args.seed
-        )
-
-        # Save training data
-        train_output_path = os.path.join(args.output_dir, "all_train.jsonl")
-        with open(train_output_path, "w", encoding='utf-8') as f:
-            for sample in train_vlmr1_dataset:
-                f.write(json.dumps(sample, ensure_ascii=False) + '\n')
-
-        print(f"\n✅ Training dataset saved!")
-        print(f"📁 File: {train_output_path}")
-        print(f"📊 Training samples: {len(train_vlmr1_dataset):,}")
+    # Add conversation datasets if they exist
+    if conv_dataset_standard:
+        dataset_info.append({"dataset":conv_dataset_standard, "id_prefix":"conv-train"})
     
-    # Generate test data (use valid split where available)
-    if args.split in ["test", "both"]:
-        print(f"\n=== GENERATING TEST DATA (using valid splits) ===")
-        
-        test_dataset_info = []
-        
-        # Only datasets that have valid/test splits
-        try:
-            print("MIMIC-CXR reports (test)")
-            mimic_test = MIMIC_Dataset_MM(datasetpath=datasetpath_mimic,
-                                         split="valid", 
-                                         flag_img=False, flag_lab=False, 
-                                         only_frontal=True, 
-                                         filtered_reports_dir=filtered_reports_dir, 
-                                         seed=0)
-            print("Num samples = " + str(len(mimic_test)))
-            test_dataset_info.append({"dataset": mimic_test, "id_prefix": "mimic-test"})
-        except Exception as e:
-            print(f"Skipping MIMIC-CXR reports test: {e}")
+    if conv_dataset_grounded:
+        dataset_info.extend([
+            {"dataset":conv_dataset_grounded, "id_prefix":"conv-grounded-train1"},
+            {"dataset":conv_dataset_grounded, "id_prefix":"conv-grounded-train2"},
+            {"dataset":conv_dataset_grounded, "id_prefix":"conv-grounded-train3"},
+            {"dataset":conv_dataset_grounded, "id_prefix":"conv-grounded-train4"},
+        ])
+    
+    if conv_dataset_grounded_padchest:
+        dataset_info.extend([
+            {"dataset":conv_dataset_grounded_padchest, "id_prefix":"conv-grounded-padchest-train1"},
+            {"dataset":conv_dataset_grounded_padchest, "id_prefix":"conv-grounded-padchest-train2"},
+            {"dataset":conv_dataset_grounded_padchest, "id_prefix":"conv-grounded-padchest-train3"},
+            {"dataset":conv_dataset_grounded_padchest, "id_prefix":"conv-grounded-padchest-train4"},
+        ])
 
-        try:
-            print("MIMIC-CXR classif (test)")
-            mimic_labels_test = MIMIC_Dataset_MM(datasetpath=datasetpath_mimic,
-                                               split="valid", 
-                                               flag_img=False, flag_lab=True, 
-                                               only_frontal=True, 
-                                               filtered_reports_dir=None, 
-                                               classif=True,
-                                               seed=0)
-            print("Num samples = " + str(len(mimic_labels_test)))
-            test_dataset_info.append({"dataset": mimic_labels_test, "id_prefix": "mimic-labels-test"})
-        except Exception as e:
-            print(f"Skipping MIMIC-CXR classif test: {e}")
+    if not dataset_info:
+        print("❌ No datasets were successfully loaded! Check data directory and permissions.")
+        return
 
-        try:
-            print("CheXpert classif (test)")
-            chexpert_test = CheXpert_Dataset_MM(datasetpath=dataset_path, split="valid", flag_img=False)
-            print("Num samples = " + str(len(chexpert_test)))
-            test_dataset_info.append({"dataset": chexpert_test, "id_prefix": "chexpert-test"})
-        except Exception as e:
-            print(f"Skipping CheXpert test: {e}")
+    # Generate VLM-R1 training dataset
+    print(f"\n🚀 Generating VLM-R1 training dataset from {len(dataset_info)} configurations...")
+    train_vlmr1_dataset = generate_vlmr1_dataset_from_instruction_dataset(
+        dataset_info, 
+        args.data_dir,
+        batch_size=args.batch_size, 
+        num_workers=args.num_workers, 
+        seed=args.seed
+    )
 
-        try:
-            print("VinDr-CXR (test)")
-            vin_test = VinDr_CXR_Dataset(datasetpath=dataset_path, split="test", flag_img=False)
-            print("Num samples = " + str(len(vin_test)))
-            test_dataset_info.append({"dataset": vin_test, "id_prefix": "vindr-cxr-test"})
-        except Exception as e:
-            print(f"Skipping VinDr-CXR test: {e}")
+    # Save training data
+    train_output_path = os.path.join(args.output_dir, args.output_file)
+    with open(train_output_path, "w", encoding='utf-8') as f:
+        for sample in train_vlmr1_dataset:
+            f.write(json.dumps(sample, ensure_ascii=False) + '\n')
 
-        if test_dataset_info:
-            print(f"\nGenerating VLM-R1 test dataset from {len(test_dataset_info)} configurations...")
-            test_vlmr1_dataset = generate_vlmr1_dataset_from_instruction_dataset(
-                test_dataset_info, 
-                args.data_dir,
-                batch_size=args.batch_size, 
-                num_workers=args.num_workers, 
-                seed=args.seed
-            )
-
-            # Save test data
-            test_output_path = os.path.join(args.output_dir, "all_test.jsonl")
-            with open(test_output_path, "w", encoding='utf-8') as f:
-                for sample in test_vlmr1_dataset:
-                    f.write(json.dumps(sample, ensure_ascii=False) + '\n')
-
-            print(f"\n✅ Test dataset saved!")
-            print(f"📁 File: {test_output_path}")
-            print(f"📊 Test samples: {len(test_vlmr1_dataset):,}")
-        else:
-            print("No test datasets available")
-
-    if args.split == "train":
-        print(f"\n🚀 Usage with VLM-R1:")
-        print(f"python -m open_r1.grpo_jsonl \\")
-        print(f"    --data_file_paths {train_output_path} \\")
-        print(f"    --image_folders {args.data_dir}/ \\")
-        print(f"    --model_name \"Qwen/Qwen2.5-VL-7B-Instruct\"")
-    elif args.split == "both":
-        print(f"\n🚀 Usage with VLM-R1:")
-        print(f"# Training:")
-        print(f"python -m open_r1.grpo_jsonl \\")
-        print(f"    --data_file_paths {train_output_path} \\")
-        print(f"    --image_folders {args.data_dir}/ \\")
-        print(f"    --model_name \"Qwen/Qwen2.5-VL-7B-Instruct\"")
-        if 'test_output_path' in locals():
-            print(f"\n# Testing:")
-            print(f"python -m open_r1.grpo_jsonl \\")
-            print(f"    --data_file_paths {test_output_path} \\")
-            print(f"    --image_folders {args.data_dir}/ \\")
-            print(f"    --model_name \"Qwen/Qwen2.5-VL-7B-Instruct\"")
+    print(f"\n✅ Training dataset saved!")
+    print(f"📁 File: {train_output_path}")
+    print(f"📊 Training samples: {len(train_vlmr1_dataset):,}")
+    print(f"📊 Successfully loaded datasets: {len(datasets_created)}")
+    
+    print(f"\n🚀 Usage with VLM-R1:")
+    print(f"python -m open_r1.grpo_jsonl \\")
+    print(f"    --data_file_paths {train_output_path} \\")
+    print(f"    --image_folders {args.data_dir}/ \\")
+    print(f"    --model_name \"Qwen/Qwen2.5-VL-7B-Instruct\"")
 
 
 if __name__ == "__main__":
