@@ -152,8 +152,8 @@ def main():
     datasetpath_mimic = os.path.join(args.data_dir, 'MIMIC-CXR-JPG')
     filtered_reports_dir = os.path.join(args.data_dir, 'MIMIC-CXR-JPG/filtered_reports')
 
-        # MIMIC-CXR reports
-        print("MIMIC-CXR reports")
+    # MIMIC-CXR reports
+    print("MIMIC-CXR reports")
         mimic_dataset_filtered = MIMIC_Dataset_MM(datasetpath=datasetpath_mimic,
                                                   split="train", 
                                                   flag_img=False, flag_lab=False, 
