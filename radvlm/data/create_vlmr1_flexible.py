@@ -408,7 +408,7 @@ Valid task-dataset combinations:
                        help="Task to generate data for")
     parser.add_argument("--dataset", help="Dataset to use (or 'both' for all datasets in a task)")
     parser.add_argument("--data-dir", default=DATA_DIR, help="Root data directory")
-    parser.add_argument("--output-dir", default="./vlmr1_flexible", help="Output directory")
+    parser.add_argument("--output-dir", default="/capstor/scratch/cscs/rfahrni/vlmr1_flexible", help="Output directory")
     parser.add_argument("--split", choices=["train", "valid", "test", "both"], default="train", 
                        help="Data split to generate")
     parser.add_argument("--batch-size", type=int, default=64, help="Batch size")
