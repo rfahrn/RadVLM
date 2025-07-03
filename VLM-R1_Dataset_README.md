@@ -50,45 +50,80 @@ The generated JSONL files follow the VLM-R1 specification:
 
 ## Scripts
 
-### 1. `create_vlmr1_comprehensive.py`
+### 1. `create_vlmr1_task_specific.py` ⭐ **RECOMMENDED**
+Task-specific script for generating specific task+dataset combinations.
+
+**List available tasks:**
+```bash
+python radvlm/data/create_vlmr1_task_specific.py --list-tasks
+```
+
+**Usage for your data path:**
+```bash
+# Report Generation - MIMIC-CXR
+python radvlm/data/create_vlmr1_task_specific.py \
+    --task report_generation \
+    --dataset mimic_cxr \
+    --data-dir /capstor/store/cscs/swissai/a135/RadVLM_project/data \
+    --output-dir ./vlmr1_datasets
+
+# Abnormality Classification - CheXpert
+python radvlm/data/create_vlmr1_task_specific.py \
+    --task abnormality_classification \
+    --dataset chexpert \
+    --data-dir /capstor/store/cscs/swissai/a135/RadVLM_project/data \
+    --output-dir ./vlmr1_datasets
+
+# Phrase Grounding - PadChest
+python radvlm/data/create_vlmr1_task_specific.py \
+    --task phrase_grounding \
+    --dataset padchest \
+    --data-dir /capstor/store/cscs/swissai/a135/RadVLM_project/data \
+    --output-dir ./vlmr1_datasets
+
+# Anatomical Grounding - Chest ImaGenome
+python radvlm/data/create_vlmr1_task_specific.py \
+    --task anatomical_grounding \
+    --dataset chest_imagenome \
+    --data-dir /capstor/store/cscs/swissai/a135/RadVLM_project/data \
+    --output-dir ./vlmr1_datasets
+
+# Test with limited samples
+python radvlm/data/create_vlmr1_task_specific.py \
+    --task report_generation \
+    --dataset mimic_cxr \
+    --data-dir /capstor/store/cscs/swissai/a135/RadVLM_project/data \
+    --output-dir ./vlmr1_datasets \
+    --limit 100
+```
+
+### 2. `create_vlmr1_comprehensive.py`
 Main script for generating training datasets from all RadVLM sources.
 
 **Usage:**
 ```bash
 # Generate all training datasets separately
 python radvlm/data/create_vlmr1_comprehensive.py \
-    --data-dir /path/to/your/datasets \
+    --data-dir /capstor/store/cscs/swissai/a135/RadVLM_project/data \
     --output-dir ./vlmr1_datasets \
     --batch-size 64 \
     --num-workers 8
 
 # Generate a single combined training file
 python radvlm/data/create_vlmr1_comprehensive.py \
-    --data-dir /path/to/your/datasets \
+    --data-dir /capstor/store/cscs/swissai/a135/RadVLM_project/data \
     --output-dir ./vlmr1_datasets \
     --combine-all
-
-# Generate specific datasets only
-python radvlm/data/create_vlmr1_comprehensive.py \
-    --data-dir /path/to/your/datasets \
-    --output-dir ./vlmr1_datasets \
-    --datasets mimic_reports chexpert vindr_cxr
-
-# Test with limited samples
-python radvlm/data/create_vlmr1_comprehensive.py \
-    --data-dir /path/to/your/datasets \
-    --output-dir ./vlmr1_datasets \
-    --limit 100
 ```
 
-### 2. `create_vlmr1_test.py`
+### 3. `create_vlmr1_test.py`
 Script for generating test/validation datasets.
 
 **Usage:**
 ```bash
 # Generate test datasets
 python radvlm/data/create_vlmr1_test.py \
-    --data-dir /path/to/your/datasets \
+    --data-dir /capstor/store/cscs/swissai/a135/RadVLM_project/data \
     --output-dir ./vlmr1_datasets \
     --combine-all
 ```
