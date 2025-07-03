@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+
 """
 Comprehensive script to generate VLM-R1 compatible JSONL datasets from RadVLM.
 This script handles all dataset types supported by RadVLM and converts them to the format
