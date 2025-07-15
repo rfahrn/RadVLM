@@ -151,12 +151,12 @@ def main():
         {"dataset": prhase_grounding_padchest_dataset, "id_prefix": "padchest-train1"},
         {"dataset": prhase_grounding_padchest_dataset, "id_prefix": "padchest-train2"},
         {"dataset": prhase_grounding_padchest_dataset, "id_prefix": "padchest-train3"},
-        {"dataset": mimic_dataset_filtered, "id_prefix": "mimic-train"},
-        {"dataset": chexpertplus_dataset, "id_prefix": "chexpertplus-train"},
-        {"dataset": chestima_dataset, "id_prefix": "chestima-train", "num_samples": 80000},
-        {"dataset": mimic_dataset_labels, "id_prefix": "mimic-labels-train"},
-        {"dataset": chexpert_dataset, "id_prefix": "chexpert-train"},
-        {"dataset": conv_dataset_standard, "id_prefix": "conv-train"},
+        #{"dataset": mimic_dataset_filtered, "id_prefix": "mimic-train"},
+        #{"dataset": chexpertplus_dataset, "id_prefix": "chexpertplus-train"},
+        #{"dataset": chestima_dataset, "id_prefix": "chestima-train", "num_samples": 80000},
+        #{"dataset": mimic_dataset_labels, "id_prefix": "mimic-labels-train"},
+        #{"dataset": chexpert_dataset, "id_prefix": "chexpert-train"},
+        #{"dataset": conv_dataset_standard, "id_prefix": "conv-train"},
         {"dataset": conv_dataset_grounded, "id_prefix": "conv-grounded-train1"},
         {"dataset": conv_dataset_grounded, "id_prefix": "conv-grounded-train2"},
         {"dataset": conv_dataset_grounded, "id_prefix": "conv-grounded-train3"},
@@ -178,7 +178,7 @@ def main():
     df = pd.DataFrame(verl_dataset)
     output_dir = '/iopsstor/scratch/cscs/rfahrni/dataset/'
     os.makedirs(output_dir, exist_ok=True)
-    output_path = os.path.join(output_dir, 'radvlm_verl_train.parquet')
+    output_path = os.path.join(output_dir, 'radvlm_verl_train_grounding.parquet')
     df.to_parquet(output_path)
     print(f"VeRL dataset saved successfully at: {output_path}")
 
