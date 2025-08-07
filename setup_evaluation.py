@@ -64,24 +64,31 @@ def print_usage_instructions():
     print("USAGE INSTRUCTIONS")
     print("="*60)
     
-    print("\n1. For single GPU execution (recommended for testing):")
+    print("\n1. For single GPU execution without accelerate:")
     print("   CUDA_VISIBLE_DEVICES=0 python radvlm/evaluation/evaluate_instructions.py \\")
     print("       --task abnormality_grounding \\")
     print("       --r1 \\")
     print("       --model_name /path/to/your/model \\")
     print("       --num_batches 10")
     
-    print("\n2. For multi-GPU execution with accelerate:")
+    print("\n2. For single GPU execution with accelerate:")
+    print("   accelerate launch --num_processes=1 radvlm/evaluation/evaluate_instructions.py \\")
+    print("       --task abnormality_grounding \\")
+    print("       --r1 \\")
+    print("       --model_name /path/to/your/model \\")
+    print("       --num_batches 10")
+    
+    print("\n3. For multi-GPU execution with accelerate:")
     print("   accelerate launch --num_processes=4 radvlm/evaluation/evaluate_instructions.py \\")
     print("       --task abnormality_grounding \\")
     print("       --r1 \\")
     print("       --model_name /path/to/your/model")
     
-    print("\n3. Required environment variables:")
+    print("\n4. Required environment variables:")
     print("   export DATA_DIR=/path/to/your/data")
     print("   export PYTHONPATH=$PYTHONPATH:/path/to/RadVLM")
     
-    print("\n4. Available tasks:")
+    print("\n5. Available tasks:")
     tasks = [
         "abnormality_classification",
         "abnormality_grounding", 

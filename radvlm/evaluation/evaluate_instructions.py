@@ -46,8 +46,9 @@ def parse_arguments():
 
 
 def is_distributed_environment():
-    """Check if we're running in a distributed environment."""
-    return 'WORLD_SIZE' in os.environ and 'RANK' in os.environ
+    """Check if we're running in a distributed environment with multiple processes."""
+    world_size = int(os.environ.get('WORLD_SIZE', '1'))
+    return world_size > 1
 
 
 def load_dataset(task, data_dir):
@@ -235,19 +236,22 @@ if __name__ == "__main__":
     tokenizer, model, processor = load_model_and_processor(args.model_name)
     
     # Handle distributed vs non-distributed execution
-    if is_distributed_environment():
+    if 'WORLD_SIZE' in os.environ:
+        # Running with accelerate launch (could be 1 or multiple processes)
         distributed_state = PartialState()
         device = distributed_state.device
         is_main_process = distributed_state.is_main_process
         num_processes = distributed_state.num_processes
         process_index = distributed_state.process_index
+        use_distributed_sampler = is_distributed_environment()  # Only use distributed sampler if > 1 process
     else:
-        # Non-distributed execution
+        # Running without accelerate launch
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         is_main_process = True
         num_processes = 1
         process_index = 0
         distributed_state = None
+        use_distributed_sampler = False
             
     model.to(device)
     model.eval()
@@ -256,7 +260,7 @@ if __name__ == "__main__":
     dataset = load_dataset(args.task, DATA_DIR)
 
     # Prepare DataLoader
-    if distributed_state is not None:
+    if use_distributed_sampler:
         sampler = DistributedSampler(
             dataset,
             num_replicas=num_processes,
@@ -284,8 +288,8 @@ if __name__ == "__main__":
         task=args.task
     )
 
-    # Gather results (only if distributed)
-    if distributed_state is not None:
+    # Gather results (only if distributed with multiple processes)
+    if distributed_state is not None and is_distributed_environment():
         distributed_state.wait_for_everyone()
         output = gather_object(output)
     
