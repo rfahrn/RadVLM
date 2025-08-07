@@ -321,8 +321,8 @@ if __name__ == "__main__":
             distributed_state.wait_for_everyone()
             print(f"Process {process_index}: Barrier passed for rank {rank}")
             
-        # Verify all processes have loaded
-        assert tokenizer is not None and model is not None and processor is not None, f"Process {process_index} failed to load model"
+        # Verify all processes have loaded (tokenizer can be None for some models like Qwen)
+        assert model is not None and processor is not None, f"Process {process_index} failed to load model"
         print(f"Process {process_index}: Sequential loading completed")
     else:
         # Single process: Load normally
