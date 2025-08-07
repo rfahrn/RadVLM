@@ -95,21 +95,35 @@ def load_model_and_processor(model_name, device_map='cpu'):
 
 
     else:
-        # Load llava-ov checkpoint 
-        common_kwargs = {
-            "torch_dtype": torch.float16,
-            "low_cpu_mem_usage": True, 
-        }
+        if 'qwen' in model_name.lower():
+            # Load Qwen checkpoint (try both Qwen2.5-VL and Qwen2-VL)
+            try:
+                model = transformers.Qwen2_5VLForConditionalGeneration.from_pretrained(
+                    model_name, torch_dtype=torch.float16, device_map=device_map
+                )
+            except:
+                model = transformers.Qwen2VLForConditionalGeneration.from_pretrained(
+                    model_name, torch_dtype=torch.float16, device_map=device_map
+                )
+            min_pixels = 256*28*28
+            max_pixels = 1280*28*28
+            processor = transformers.AutoProcessor.from_pretrained(model_name, min_pixels=min_pixels, max_pixels=max_pixels)
+        else:
+            # Load llava-ov checkpoint 
+            common_kwargs = {
+                "torch_dtype": torch.float16,
+                "low_cpu_mem_usage": True, 
+            }
 
-        if model_name == 'llavaov':
-            model_name = 'llava-hf/llava-onevision-qwen2-7b-si-hf'
+            if model_name == 'llavaov':
+                model_name = 'llava-hf/llava-onevision-qwen2-7b-si-hf'
 
-        model = transformers.LlavaOnevisionForConditionalGeneration.from_pretrained(
-            model_name,
-            device_map=device_map,
-            **common_kwargs
-        )
-        processor = transformers.AutoProcessor.from_pretrained(model_name)
+            model = transformers.LlavaOnevisionForConditionalGeneration.from_pretrained(
+                model_name,
+                device_map=device_map,
+                **common_kwargs
+            )
+            processor = transformers.AutoProcessor.from_pretrained(model_name)
 
     return tokenizer, model, processor
 
@@ -511,3 +525,45 @@ def inference_chexagent(model, tokenizer, image_path, prompt, grounding=False, m
 
 
     return generated_text
+
+
+def inference_qwen2vl(model, processor, image_path, prompt, max_new_tokens=500):
+    """
+    Inference function for Qwen2VL models.
+    """
+    # Load and process image
+    image = Image.open(image_path).convert('RGB')
+    
+    # Create conversation
+    messages = [
+        {
+            "role": "user",
+            "content": [
+                {"type": "image", "image": image},
+                {"type": "text", "text": prompt}
+            ]
+        }
+    ]
+    
+    # Apply chat template and prepare inputs
+    text = processor.apply_chat_template(
+        messages, tokenize=False, add_generation_prompt=True
+    )
+    
+    inputs = processor(
+        text=[text], images=[image], return_tensors="pt"
+    ).to(model.device)
+    
+    # Generate response
+    with torch.inference_mode():
+        output = model.generate(
+            **inputs, 
+            max_new_tokens=max_new_tokens, 
+            do_sample=False
+        )
+    
+    # Decode response
+    generated_ids = output[0][inputs['input_ids'].shape[-1]:]
+    generated_text = processor.decode(generated_ids, skip_special_tokens=True)
+    
+    return generated_text, []
