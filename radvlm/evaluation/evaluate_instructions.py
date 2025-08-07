@@ -233,9 +233,8 @@ def ensure_directory_exists(path):
 if __name__ == "__main__":
 
     args = parse_arguments()
-    tokenizer, model, processor = load_model_and_processor(args.model_name)
     
-    # Handle distributed vs non-distributed execution
+    # Handle distributed vs non-distributed execution first
     if 'WORLD_SIZE' in os.environ:
         # Running with accelerate launch (could be 1 or multiple processes)
         distributed_state = PartialState()
@@ -252,9 +251,28 @@ if __name__ == "__main__":
         process_index = 0
         distributed_state = None
         use_distributed_sampler = False
+
+    # Load model with staggered loading for distributed execution to avoid I/O contention
+    if distributed_state is not None and is_distributed_environment():
+        # Stagger the loading across processes to reduce I/O contention
+        import time
+        time.sleep(process_index * 2)  # Each process waits 2 seconds per rank
+        print(f"Loading model on process {process_index}...")
+        tokenizer, model, processor = load_model_and_processor(args.model_name, device_map='cpu')
+        print(f"Model loaded on process {process_index}")
+    else:
+        # Single process: Load normally
+        print("Loading model...")
+        tokenizer, model, processor = load_model_and_processor(args.model_name)
+        print("Model loaded")
             
     model.to(device)
     model.eval()
+
+    # Wait for all processes to finish loading before proceeding
+    if distributed_state is not None:
+        distributed_state.wait_for_everyone()
+        print(f"All models loaded. Process {process_index} proceeding...")
 
     # Load dataset
     dataset = load_dataset(args.task, DATA_DIR)
