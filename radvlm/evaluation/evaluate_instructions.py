@@ -234,6 +234,10 @@ if __name__ == "__main__":
 
     args = parse_arguments()
     
+    # Debug: Print arguments
+    print(f"Model name: {args.model_name}")
+    print(f"Task: {args.task}")
+    
     # Handle distributed vs non-distributed execution first
     if 'WORLD_SIZE' in os.environ:
         # Running with accelerate launch (could be 1 or multiple processes)
@@ -252,27 +256,36 @@ if __name__ == "__main__":
         distributed_state = None
         use_distributed_sampler = False
 
+    # Debug: Print distributed environment detection
+    print(f"Process {process_index}: WORLD_SIZE={os.environ.get('WORLD_SIZE', 'not set')}")
+    print(f"Process {process_index}: distributed_state is not None: {distributed_state is not None}")
+    print(f"Process {process_index}: is_distributed_environment(): {is_distributed_environment()}")
+    
     # Load model with sequential loading for distributed execution to avoid I/O contention
     if distributed_state is not None and is_distributed_environment():
+        print(f"Process {process_index}: Using sequential loading for {num_processes} processes")
         # Sequential loading: each process loads one at a time
         tokenizer, model, processor = None, None, None
         
         for rank in range(num_processes):
             if rank == process_index:
-                print(f"Loading model on process {process_index}...")
+                print(f"Process {process_index}: My turn to load (rank {rank})")
                 tokenizer, model, processor = load_model_and_processor(args.model_name, device_map='cpu')
-                print(f"Model loaded on process {process_index}")
+                print(f"Process {process_index}: Model loaded successfully")
             else:
-                print(f"Process {process_index} waiting for process {rank} to load...")
+                print(f"Process {process_index}: Waiting for process {rank} to load...")
             
             # Wait for current process to finish before next one starts
+            print(f"Process {process_index}: Syncing at barrier for rank {rank}")
             distributed_state.wait_for_everyone()
+            print(f"Process {process_index}: Barrier passed for rank {rank}")
             
         # Verify all processes have loaded
         assert tokenizer is not None and model is not None and processor is not None, f"Process {process_index} failed to load model"
+        print(f"Process {process_index}: Sequential loading completed")
     else:
         # Single process: Load normally
-        print("Loading model...")
+        print(f"Process {process_index}: Using single process loading")
         tokenizer, model, processor = load_model_and_processor(args.model_name)
         print("Model loaded")
             
