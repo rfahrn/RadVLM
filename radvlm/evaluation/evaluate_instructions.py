@@ -274,17 +274,22 @@ if __name__ == "__main__":
     print(f"Task: {args.task}")
     print(f"R1 mode: {args.r1}")
     
-    # Load model
-    print("Loading model...")
-    tokenizer, model, processor = load_model_and_processor(args.model_name)
-    print("Model loaded successfully")
-    
-    # Setup distributed state
+    # Setup distributed state first
     distributed_state = PartialState()
     print(f"Process {distributed_state.process_index}/{distributed_state.num_processes}")
     
-    model.to(distributed_state.device)
-    model.eval()
+    # Sequential model loading to avoid I/O contention
+    print("Loading model sequentially...")
+    for rank in range(distributed_state.num_processes):
+        if distributed_state.process_index == rank:
+            print(f"Process {rank}: Loading model now")
+            tokenizer, model, processor = load_model_and_processor(args.model_name)
+            print(f"Process {rank}: Model loaded successfully")
+            model.to(distributed_state.device)
+            model.eval()
+        distributed_state.wait_for_everyone()
+    
+    print("All models loaded, continuing...")
 
     # Load dataset
     print("Loading dataset...")
