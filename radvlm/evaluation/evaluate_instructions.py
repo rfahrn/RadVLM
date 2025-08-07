@@ -186,17 +186,42 @@ def process_inference_for_single_instruction(tokenizer, model, processor, data_l
             from radvlm.evaluation.models_loading_inference import inference_qwen2vl
             generated_text, _ = inference_qwen2vl(model, processor, image_path, prompt)
             
-            # Handle --r1 flag: remove thinking tags
-            if args.r1 and '</think>' in generated_text:
-                # Extract content after </think>
-                parts = generated_text.split('</think>')
-                if len(parts) > 1:
-                    generated_text = parts[-1].strip()
-            elif args.r1 and '</夃>' in generated_text:
-                # Alternative thinking tag
-                parts = generated_text.split('</夃>')
-                if len(parts) > 1:
-                    generated_text = parts[-1].strip()
+            # Handle --r1 flag: extract answer from structured tags
+            if args.r1:
+                # Debug: Print raw output for first few examples
+                if batch_i < 3 and process_index == 0:
+                    print(f"DEBUG - Raw model output: {generated_text[:500]}...")
+                
+                # First try to extract from <answer> tags (GRPO training format)
+                import re
+                answer_match = re.search(r'<answer>(.*?)</answer>', generated_text, re.IGNORECASE | re.DOTALL)
+                if answer_match:
+                    extracted = answer_match.group(1).strip()
+                    if batch_i < 3 and process_index == 0:
+                        print(f"DEBUG - Extracted from <answer>: {extracted}")
+                    generated_text = extracted
+                # Fallback: remove thinking tags
+                elif '</think>' in generated_text:
+                    parts = generated_text.split('</think>')
+                    if len(parts) > 1:
+                        extracted = parts[-1].strip()
+                        if batch_i < 3 and process_index == 0:
+                            print(f"DEBUG - Extracted after </think>: {extracted}")
+                        generated_text = extracted
+                elif '</夃>' in generated_text:
+                    parts = generated_text.split('</夃>')
+                    if len(parts) > 1:
+                        extracted = parts[-1].strip()
+                        if batch_i < 3 and process_index == 0:
+                            print(f"DEBUG - Extracted after </夃>: {extracted}")
+                        generated_text = extracted
+                else:
+                    if batch_i < 3 and process_index == 0:
+                        print(f"DEBUG - No structured tags found, using raw output")
+            
+            if batch_i < 3 and process_index == 0:
+                print(f"DEBUG - Final output: {generated_text}")
+                print("="*80)
         else:
             # for llava-ov checkpoint
             generated_text, _ = inference_llavaov(model, processor, image_path, prompt)
