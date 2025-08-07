@@ -255,14 +255,21 @@ if __name__ == "__main__":
     # Load model with sequential loading for distributed execution to avoid I/O contention
     if distributed_state is not None and is_distributed_environment():
         # Sequential loading: each process loads one at a time
+        tokenizer, model, processor = None, None, None
+        
         for rank in range(num_processes):
             if rank == process_index:
                 print(f"Loading model on process {process_index}...")
                 tokenizer, model, processor = load_model_and_processor(args.model_name, device_map='cpu')
                 print(f"Model loaded on process {process_index}")
+            else:
+                print(f"Process {process_index} waiting for process {rank} to load...")
             
             # Wait for current process to finish before next one starts
             distributed_state.wait_for_everyone()
+            
+        # Verify all processes have loaded
+        assert tokenizer is not None and model is not None and processor is not None, f"Process {process_index} failed to load model"
     else:
         # Single process: Load normally
         print("Loading model...")
