@@ -181,6 +181,22 @@ def process_inference_for_single_instruction(tokenizer, model, processor, data_l
                 generated_text = inference_maira2_report(model, processor, image_path, prompt)
             elif task == 'abnormality_grounding' or task == 'phrase_grounding' or task == 'region_grounding':
                 generated_text = inference_maira2_grounding(model, processor, image_path, datapoint['label'])
+        elif 'qwen' in args.model_name.lower():
+            # for qwen models - import the function
+            from radvlm.evaluation.models_loading_inference import inference_qwen2vl
+            generated_text, _ = inference_qwen2vl(model, processor, image_path, prompt)
+            
+            # Handle --r1 flag: remove thinking tags
+            if args.r1 and '</think>' in generated_text:
+                # Extract content after </think>
+                parts = generated_text.split('</think>')
+                if len(parts) > 1:
+                    generated_text = parts[-1].strip()
+            elif args.r1 and '</夃>' in generated_text:
+                # Alternative thinking tag
+                parts = generated_text.split('</夃>')
+                if len(parts) > 1:
+                    generated_text = parts[-1].strip()
         else:
             # for llava-ov checkpoint
             generated_text, _ = inference_llavaov(model, processor, image_path, prompt)
