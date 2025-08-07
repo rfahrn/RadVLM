@@ -5,6 +5,7 @@ import random
 from torch.utils.data import DataLoader, DistributedSampler
 from accelerate import PartialState
 from accelerate.utils import gather_object
+import torch
     
 from radvlm.data.utils import custom_collate_fn
 from radvlm.data.datasets import (
@@ -40,8 +41,13 @@ def parse_arguments():
     ], help='The task to perform')
     parser.add_argument('--model_name', type=str, required=True, help='The model name to evaluate')
     parser.add_argument('--num_batches', type=int, default=None, help='Number of batches to process, if none process all')
+    parser.add_argument('--r1', action='store_true', help='Flag for r1 configuration')
     return parser.parse_args()
-    
+
+
+def is_distributed_environment():
+    """Check if we're running in a distributed environment."""
+    return 'WORLD_SIZE' in os.environ and 'RANK' in os.environ
 
 
 def load_dataset(task, data_dir):
@@ -227,26 +233,43 @@ if __name__ == "__main__":
 
     args = parse_arguments()
     tokenizer, model, processor = load_model_and_processor(args.model_name)
-        
-    distributed_state = PartialState()
+    
+    # Handle distributed vs non-distributed execution
+    if is_distributed_environment():
+        distributed_state = PartialState()
+        device = distributed_state.device
+        is_main_process = distributed_state.is_main_process
+        num_processes = distributed_state.num_processes
+        process_index = distributed_state.process_index
+    else:
+        # Non-distributed execution
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        is_main_process = True
+        num_processes = 1
+        process_index = 0
+        distributed_state = None
             
-    model.to(distributed_state.device)
+    model.to(device)
     model.eval()
 
     # Load dataset
     dataset = load_dataset(args.task, DATA_DIR)
 
     # Prepare DataLoader
-    sampler = DistributedSampler(
-        dataset,
-        num_replicas=distributed_state.num_processes,
-        rank=distributed_state.process_index
-    )
+    if distributed_state is not None:
+        sampler = DistributedSampler(
+            dataset,
+            num_replicas=num_processes,
+            rank=process_index
+        )
+    else:
+        sampler = None
+        
     data_loader = DataLoader(
         dataset,
         batch_size=1,
         sampler=sampler,
-        shuffle=False,
+        shuffle=(sampler is None),  # Only shuffle if not using distributed sampler
         collate_fn=custom_collate_fn
     )
 
@@ -261,15 +284,17 @@ if __name__ == "__main__":
         task=args.task
     )
 
-    # Gather results
-    distributed_state.wait_for_everyone()
-    output = gather_object(output)
+    # Gather results (only if distributed)
+    if distributed_state is not None:
+        distributed_state.wait_for_everyone()
+        output = gather_object(output)
+    
     if args.task == "report_generation":
         save_results(output, args.model_name, args.task, args.num_batches, output=True)
 
 
     # Evaluate and save results
-    if distributed_state.is_main_process:
+    if is_main_process:
         display_sample_outputs(output)
         if args.task == "region_grounding" or args.task=="abnormality_grounding" or args.task=="phrase_grounding":
             plot_images_with_Bbox(output, num_samples=16, results_dir=RESULTS_DIR)
