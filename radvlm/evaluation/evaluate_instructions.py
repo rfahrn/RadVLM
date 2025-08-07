@@ -252,14 +252,17 @@ if __name__ == "__main__":
         distributed_state = None
         use_distributed_sampler = False
 
-    # Load model with staggered loading for distributed execution to avoid I/O contention
+    # Load model with sequential loading for distributed execution to avoid I/O contention
     if distributed_state is not None and is_distributed_environment():
-        # Stagger the loading across processes to reduce I/O contention
-        import time
-        time.sleep(process_index * 2)  # Each process waits 2 seconds per rank
-        print(f"Loading model on process {process_index}...")
-        tokenizer, model, processor = load_model_and_processor(args.model_name, device_map='cpu')
-        print(f"Model loaded on process {process_index}")
+        # Sequential loading: each process loads one at a time
+        for rank in range(num_processes):
+            if rank == process_index:
+                print(f"Loading model on process {process_index}...")
+                tokenizer, model, processor = load_model_and_processor(args.model_name, device_map='cpu')
+                print(f"Model loaded on process {process_index}")
+            
+            # Wait for current process to finish before next one starts
+            distributed_state.wait_for_everyone()
     else:
         # Single process: Load normally
         print("Loading model...")
