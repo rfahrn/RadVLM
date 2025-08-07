@@ -21,7 +21,15 @@ from radvlm.evaluation.models_loading_inference import load_model_and_processor,
 from radvlm.evaluation.utils import plot_images_with_Bbox
 from radvlm.evaluation.compute_metrics_tasks import evaluate_results
 
-from radvlm import DATA_DIR
+# Handle DATA_DIR import safely
+try:
+    from radvlm import DATA_DIR
+except Exception:
+    # Fallback if radvlm import fails
+    DATA_DIR = os.environ.get('DATA_DIR', '/path/to/data')
+    if DATA_DIR == '/path/to/data':
+        print("WARNING: DATA_DIR not set. Please set DATA_DIR environment variable.")
+        print("Example: export DATA_DIR=/your/data/path")
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 RESULTS_DIR = os.path.join(script_dir, "results")
